@@ -8,46 +8,63 @@ import java.util.ArrayList;
  */ 
 public class Trie
 {
-    // The root of this trie.
-    private TrieNode root;
+	// The root of this trie.
+	private TrieNode root;
 
-    /* Takes a list of strings as an argument, and constructs a trie that stores these strings. */
-    public Trie(ArrayList<String> list) {
-        root = new TrieNode();
-        for (String word : list) {
-            root.addWord(word);
-        }
-    }  
-    
+	/* Takes a list of strings as an argument, and constructs a trie that stores these strings. */
+	public Trie(ArrayList<String> list) {
+		root = new TrieNode();
+		for (String word : list) {
+			root.addWord(word);
+		}
+	}  
+	
 
-    /* Takes a list of strings as an argument, and constructs a trie that stores these strings. */    
-    public Trie(String[] list) {
-        root = new TrieNode();
-        for (String word : list) {
-            root.addWord(word);
-        }
-    }    
+	/* Takes a list of strings as an argument, and constructs a trie that stores these strings. */    
+	public Trie(String[] list) {
+		root = new TrieNode();
+		for (String word : list) {
+			root.addWord(word);
+		}
+	}    
 
-    /* Checks whether this trie contains a string with the prefix passed
-     * in as argument.
-     */
-    public boolean contains(String prefix, boolean exact) {
-        TrieNode lastNode = root;
-        int i = 0;
-        for (i = 0; i < prefix.length(); i++) {
-            lastNode = lastNode.getChild(prefix.charAt(i));
-            if (lastNode == null) {
-                return false;	 
-            }
-        }
-        return !exact || lastNode.terminates();
-    }
-    
-    public boolean contains(String prefix) {
-    	return contains(prefix, false);
-    }
-    
-    public TrieNode getRoot() {
-    	return root;
-    }
+	/* Checks whether this trie contains a string with the prefix passed
+	 * in as argument.
+	 */
+	public boolean contains(String prefix, boolean exact) {
+		TrieNode lastNode = root;
+		int i = 0;
+		for (i = 0; i < prefix.length(); i++) {
+			lastNode = lastNode.getChild(prefix.charAt(i));
+			if (lastNode == null) {
+				return false;	 
+			}
+		}
+		return !exact || lastNode.terminates();
+	}
+	
+	public boolean contains(String prefix) {
+		return contains(prefix, false);
+	}
+	
+	public TrieNode getRoot() {
+		return root;
+	}
+
+	public int maxDepth() {
+		return root.maxDepth();
+	}
+
+	public int maxDepth(String prefix) {
+		if (!contains(prefix)) return 0;
+		else return root.maxDepth(prefix);
+	}
+
+	public String longestString() {
+		return root.longestSubString();
+	}
+
+	public String longestWithPrefix(String prefix) {
+		return root.longestWithPrefix(prefix);
+	}
 }

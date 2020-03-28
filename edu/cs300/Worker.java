@@ -20,7 +20,10 @@ class Worker extends Thread {
 		this.prefixRequestArray=prefix;
 		this.resultsOutputArray=results;
 		this.id=id;
-		this.passageName="Passage-"+Integer.toString(id)+".txt";//put name of passage here
+		
+		String[] splitPath = path.split("/");
+		this.passageName=splitPath[splitPath.length-1];//put name of passage here
+
 		this.passagePath = path;
 		this.running = true;
 	}
@@ -42,7 +45,7 @@ class Worker extends Thread {
 			word = passage.next();
 			if (word.length() < 3 || word.contains("\'") || word.contains("-")) continue;
 
-			goodWords.add(word);
+			goodWords.add(word.toLowerCase());
 		}
 
 		return goodWords;
@@ -51,10 +54,15 @@ class Worker extends Thread {
 	public void run() {
 		System.out.println("Worker-"+this.id+" ("+this.passageName+") thread started ...");
 		this.textTrieTree = new Trie(getWordList());
+		// System.out.println("Worker-"+this.id+" Max Depth:"+this.textTrieTree.maxDepth());
+		// System.out.println("Worker-"+this.id+" Longest String:"+this.textTrieTree.longestString());
+		
 
-		while (running){
+		while (running) {
 			try {
-				String prefix=(String)this.prefixRequestArray.take();
+				String prefix = this.prefixRequestArray.take();
+				if (prefix.length()<3) break;
+
 				boolean found = this.textTrieTree.contains(prefix);
 				
 				if (!found){
@@ -62,12 +70,17 @@ class Worker extends Thread {
 					resultsOutputArray.put(passageName+":"+prefix+" not found");
 				} else{
 					//System.out.println("Worker-"+this.id+" "+req.requestID+":"+ prefix+" ==> "+word);
-					resultsOutputArray.put(passageName+":"+prefix+" found");
+					resultsOutputArray.put(passageName+":"+prefix+" found : "+this.textTrieTree.longestWithPrefix(prefix));
 				}
+				
 			} catch(InterruptedException e){
 				System.out.println(e.getMessage());
 			}
 		}
+	}
+
+	public void kill() {
+		running = false;
 	}
 
 }
