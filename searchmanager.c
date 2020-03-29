@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 // Format:
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
 
@@ -9,12 +11,19 @@ int main(int argc, char** argv) {
 
 	secs = atoi(argv[1]);
 	printf("Parsed: %d, Original: %s\n",secs,argv[1]);
+	char* msg_send_command = "./msgsnd ";
+	char final_command[100];
 
 	int i;
 	for (i=2;i<argc;i++) {
-		// send prefix
+		final_command[0] = '\0';
+		strcat(final_command,msg_send_command);
+		strcat(final_command,argv[i]);
+		int status = system(final_command);
+		// printf("%s\n",final_command);
 		// wait secs
-		printf("%s\n",argv[i]);
+		sleep(secs);
+		// printf("%s\n",argv[i]);
 	}
 
 	
