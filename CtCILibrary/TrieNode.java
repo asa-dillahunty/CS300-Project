@@ -123,7 +123,7 @@ public class TrieNode {
 	}
 
 	public String longestWithPrefix(String prefix) {
-		if (prefix.length() == 0) return this.character + longestSubString().substring(1);
+		if (prefix.length() == 0) return longestSubString();
 
 		// char care = prefix.charAt(0);
 		// TrieNode temp = children.get(care);

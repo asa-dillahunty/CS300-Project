@@ -1,5 +1,5 @@
-Sense_And_Sensibility.txt
-Mansfield_Park.txt
-The_Call_Of_The_Wild.txt
-Tale_Of_Two_Cities.txt
-Peter_Pan.txt
+texts/Sense_And_Sensibility.txt
+texts/Mansfield_Park.txt
+texts/The_Call_Of_The_Wild.txt
+texts/Tale_Of_Two_Cities.txt
+texts/Peter_Pan.txt
