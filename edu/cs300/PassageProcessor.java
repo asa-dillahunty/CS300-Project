@@ -9,7 +9,7 @@ public class PassageProcessor {
 	private static String PASSAGES_PATHS = "passages.txt";
 	private static int BLOCK_QUEUE_SIZE = 10;
 
-	public static void main(String[] args) {
+	public static void testMe() {
 		ArrayList<String> paths = new ArrayList<String>();
 		// ArrayBlockingQueue prefixRequestArray;
 		
