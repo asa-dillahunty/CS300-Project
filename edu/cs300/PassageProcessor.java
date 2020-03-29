@@ -10,69 +10,38 @@ public class PassageProcessor {
 	private static int BLOCK_QUEUE_SIZE = 10;
 
 	public static void main(String[] args) {
-		ArrayList<String> paths = new ArrayList<String>();
+		ArrayList<Worker> workers = new ArrayList<Worker>();
+		ArrayBlockingQueue<String> results = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
+		ArrayBlockingQueue<String> prefixQueue = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
 		// ArrayBlockingQueue prefixRequestArray;
 		
 		try {
 			Scanner pass = new Scanner(new File(PASSAGES_PATHS));
-			while (pass.hasNextLine())
-				paths.add(pass.nextLine());
+			while (pass.hasNextLine()) {
+				workers.add(new Worker(pass.nextLine(),workers.size(),new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE), results));
+				workers.get(workers.size()-1).start();
+			}
 			pass.close();
 		}
 		catch(Exception e){return;}
 
-		ArrayBlockingQueue<String> results = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
-
-		Worker[] workers = new Worker[paths.size()];
-		for (int i=0;i<paths.size();i++) {
-			workers[i] = new Worker(paths.get(i), i, new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE),results);
-			workers[i].start();
-		}
-
+		PrefixManager pManager = new PrefixManager(prefixQueue, workers);
+		pManager.start();
+		
+		
 		// while prefixes exist
 		// Somehow get a prefix
-		String prefix = "wor";
-		for (Worker slave : workers) {
-			try {
-				slave.prefixRequestArray.put(prefix);
-			} catch (Exception e) {System.out.println("Cannot put prefix \"" + prefix + "\" in worker("+slave.id+")'s array");}
-		}
+		prefixQueue.add("con");
 
-
-		
-		// boolean finished = false;
-		// while (!finished) {
-		// 	finished = true;
-		// 	for (Worker slave : workers) {
-		// 		if (slave.resultsOutputArray.isEmpty()) {
-		// 			finished = false;
-		// 			break;
-		// 		}
-		// 	}
-		// }
-
-		for (int i=0;i<workers.length;i++)
+		for (int i=0;i<workers.size();i++)
 			try {
 				System.out.println(results.take());
 			} catch (Exception e) {}
 
-		// for (Worker slave : workers) {
-		// 	try {
-		// 		System.out.println("Worker("+slave.id+"): "+slave.resultsOutputArray.take());
-		// 	} catch (Exception e) {
-		// 		System.out.println("Worker("+slave.id+"): Threw an error.");
-		// 	}
-		// }
-
 		// after all the prefixes
 		// kill the worker threads
-		for (Worker slave : workers) {
-			slave.kill();
-
-			// this gives an invalid prefix, so the thread knows to stop
-			slave.prefixRequestArray.add("");
-			// slave.stop();
-		}
+		// this gives an invalid prefix, so the thread knows to stop
+		prefixQueue.add("");
 
 		for (Worker slave : workers) {
 			try {
@@ -83,16 +52,17 @@ public class PassageProcessor {
 		}
 	}
 
-	class PrefixManager extends Thread {
+	static class PrefixManager extends Thread {
 		public ArrayBlockingQueue<String> prefixes;
 		public ArrayList<Worker> workers;
 
 		public PrefixManager(ArrayBlockingQueue<String> prefixes, ArrayList<Worker> workers) {
 			this.prefixes = prefixes;
+			this.workers = workers;
 		}
 
 		public void run() {
-			String prefix;
+			String prefix = "*";
 			
 			while (true) {
 				try {
@@ -107,6 +77,7 @@ public class PassageProcessor {
 			}
 			
 			for (Worker slave : workers) {
+				slave.kill();
 				slave.prefixRequestArray.add("");
 			}
 		}

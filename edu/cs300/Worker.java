@@ -60,6 +60,7 @@ class Worker extends Thread {
 
 		while (running) {
 			try {
+				// System.out.println("Worker");
 				String prefix = this.prefixRequestArray.take();
 				if (prefix.length()<3) break;
 
