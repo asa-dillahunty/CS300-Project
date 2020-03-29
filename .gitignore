@@ -1,0 +1,10 @@
+# Compiled class files
+*.class
+
+# Compiled C files
+msgrcv
+msgsnd
+*.o
+
+# Mac OS stuff
+.DS_Store
