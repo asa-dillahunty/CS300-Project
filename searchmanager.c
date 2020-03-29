@@ -26,6 +26,12 @@ int main(int argc, char** argv) {
 		// printf("%s\n",argv[i]);
 	}
 
+	// let passageProcessor know I am done
+	final_command[0] = '\0';
+	strcat(final_command,msg_send_command);
+	strcat(final_command,"*");
+	int status = system(final_command);
+
 	
 	return 0;
 }

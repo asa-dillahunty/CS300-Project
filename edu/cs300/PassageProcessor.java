@@ -34,6 +34,7 @@ public class PassageProcessor {
 		while(true) {
 			//get prefix from this statement
 			SearchRequest message = MessageJNI.readPrefixRequestMsg();
+			if (message.prefix.length() < 3) break;
 			prefixQueue.add(message.prefix);
 
 			for (int i=0;i<workers.size();i++)
@@ -41,7 +42,6 @@ public class PassageProcessor {
 					System.out.println(results.take());
 				} catch (Exception e) {}
 
-			break;
 		}
 
 		// after all the prefixes
