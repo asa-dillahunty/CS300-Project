@@ -31,12 +31,18 @@ public class PassageProcessor {
 		
 		// while prefixes exist
 		// Somehow get a prefix
-		prefixQueue.add("con");
+		while(true) {
+			//get prefix from this statement
+			SearchRequest message = MessageJNI.readPrefixRequestMsg();
+			prefixQueue.add(message.prefix);
 
-		for (int i=0;i<workers.size();i++)
-			try {
-				System.out.println(results.take());
-			} catch (Exception e) {}
+			for (int i=0;i<workers.size();i++)
+				try {
+					System.out.println(results.take());
+				} catch (Exception e) {}
+
+			break;
+		}
 
 		// after all the prefixes
 		// kill the worker threads
