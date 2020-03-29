@@ -1,4 +1,4 @@
-J_OBJS = PassageProcessor.class Worker.class Trie.class TrieNode.class TextSamples.class edu_cs300_MessageJNI.h
+J_OBJS = edu/cs300/PassageProcessor.class edu/cs300/Worker.class CtCILibrary/Trie.class CtCILibrary/TrieNode.class edu/cs300/TextSamples.class edu_cs300_MessageJNI.h
 C_OBJS = searchmanager msgsnd msgrcv
 
 all: $(J_OBJS) $(C_OBJS)
@@ -7,19 +7,19 @@ all: $(J_OBJS) $(C_OBJS)
 edu_cs300_MessageJNI.h: edu/cs300/MessageJNI.java
 	javac -h . edu/cs300/MessageJNI.java
 
-PassageProcessor.class: edu/cs300/PassageProcessor.java edu/cs300/Worker.java
+edu/cs300/PassageProcessor.class: edu/cs300/PassageProcessor.java edu/cs300/Worker.java
 	javac edu/cs300/PassageProcessor.java
 
-Worker.class: edu/cs300/Worker.java
+edu/cs300/Worker.class: edu/cs300/Worker.java
 	javac edu/cs300/Worker.java
 
-TextSamples.class: edu/cs300/TextSamples.java
+edu/cs300/TextSamples.class: edu/cs300/TextSamples.java
 	javac edu/cs300/TextSamples.java
 
-Trie.class: CtCILibrary/Trie.java CtCILibrary/TrieNode.java
+CtCILibrary/Trie.class: CtCILibrary/Trie.java CtCILibrary/TrieNode.java
 	javac CtCILibrary/Trie.java
 
-TrieNode.class: CtCILibrary/TrieNode.java
+CtCILibrary/TrieNode.class: CtCILibrary/TrieNode.java
 	javac CtCILibrary/TrieNode.java
 
 searchmanager: searchmanager.c
