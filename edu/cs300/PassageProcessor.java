@@ -82,4 +82,33 @@ public class PassageProcessor {
 			}
 		}
 	}
+
+	class PrefixManager extends Thread {
+		public ArrayBlockingQueue<String> prefixes;
+		public ArrayList<Worker> workers;
+
+		public PrefixManager(ArrayBlockingQueue<String> prefixes, ArrayList<Worker> workers) {
+			this.prefixes = prefixes;
+		}
+
+		public void run() {
+			String prefix;
+			
+			while (true) {
+				try {
+					prefix = prefixes.take(); 
+				} catch (Exception e) {break;}
+
+				if (prefix.length() < 3) break;
+
+				for (Worker slave : workers) {
+					slave.prefixRequestArray.add(prefix);
+				}
+			}
+			
+			for (Worker slave : workers) {
+				slave.prefixRequestArray.add("");
+			}
+		}
+	}
 }

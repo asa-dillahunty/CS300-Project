@@ -1,0 +1,11 @@
+texts/book.txt
+texts/simple1.txt
+texts/simple2.txt
+texts/simple3.txt
+texts/Mansfield_Park.txt
+texts/Little_Women.txt
+texts/Peter_Pan.txt
+texts/Pride_And_Prejudice.txt
+texts/Sense_And_Sensibility.txt
+texts/Tale_Of_Two_Cities.txt
+texts/The_Call_Of_The_Wild.txt
