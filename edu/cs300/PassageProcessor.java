@@ -42,9 +42,11 @@ public class PassageProcessor {
 				try {
 					Thread.sleep(1);
 				} catch (Exception e) {}
-				continue;
+				break;
 			}
 			if (message.prefix.length() < 3) break;
+			System.out.println("**prefix("+message.requestID+") "+message.prefix+" recieved");
+			// **prefix(1) con received
 			prefixQueue.add(message.prefix);
 
 			for (int i=0;i<workers.size();i++)
