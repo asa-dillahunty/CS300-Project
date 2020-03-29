@@ -4,6 +4,7 @@
 # Compiled C files
 msgrcv
 msgsnd
+searchmanager
 *.o
 
 # Mac OS stuff

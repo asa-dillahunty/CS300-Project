@@ -10,6 +10,9 @@ public class PassageProcessor {
 	private static int BLOCK_QUEUE_SIZE = 10;
 
 	public static void main(String[] args) {
+		boolean printing = true;
+		if (args.length > 0) printing = false;
+
 		ArrayList<Worker> workers = new ArrayList<Worker>();
 		ArrayBlockingQueue<String> results = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
 		ArrayBlockingQueue<String> prefixQueue = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
@@ -34,12 +37,26 @@ public class PassageProcessor {
 		while(true) {
 			//get prefix from this statement
 			SearchRequest message = MessageJNI.readPrefixRequestMsg();
+			if (message == null) {
+				System.out.println("null message");
+				try {
+					Thread.sleep(1);
+				} catch (Exception e) {}
+				continue;
+			}
 			if (message.prefix.length() < 3) break;
 			prefixQueue.add(message.prefix);
 
 			for (int i=0;i<workers.size();i++)
 				try {
-					System.out.println(results.take());
+					if (printing) {
+						System.out.println(results.take());
+					}
+					else {
+						// send results
+						// I'm not sure how
+						results.take();
+					}
 				} catch (Exception e) {}
 
 		}

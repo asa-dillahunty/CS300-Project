@@ -9,6 +9,18 @@ int main(int argc, char** argv) {
 	if (argc < 3) return 0;
 	int secs; // seconds between sending prefix requests
 
+	int rc = fork();
+
+	if (rc < 0) {
+		fprintf(stderr, "fork failed\n");
+		exit(1);
+	} else if (rc == 0) {
+		// child
+		int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor false");
+		return 0;
+	}
+	// parent
+
 	secs = atoi(argv[1]);
 	printf("Parsed: %d, Original: %s\n",secs,argv[1]);
 	char* msg_send_command = "./msgsnd ";
@@ -29,7 +41,7 @@ int main(int argc, char** argv) {
 	// let passageProcessor know I am done
 	final_command[0] = '\0';
 	strcat(final_command,msg_send_command);
-	strcat(final_command,"*");
+	strcat(final_command,"no");
 	int status = system(final_command);
 
 	
