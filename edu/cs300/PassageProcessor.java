@@ -10,10 +10,6 @@ public class PassageProcessor {
 	private static int BLOCK_QUEUE_SIZE = 10;
 
 	public static void main(String[] args) {
-		boolean printing = true;
-		if (args.length > 0) printing = false;
-		// int prefixCount = 0;
-
 		ArrayList<Worker> workers = new ArrayList<Worker>();
 		ArrayBlockingQueue<String> results = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
 		ArrayBlockingQueue<String> prefixQueue = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
@@ -61,31 +57,24 @@ public class PassageProcessor {
 			String[] split_again;
 			for (int i=0;i<workers.size();i++)
 				try {
-					if (printing) {
-						msg = results.take();
+					msg = results.take();
 
-						msg_split = msg.split("-");
-						split_again = msg_split[1].split(" ");
-						worker_id = Integer.parseInt(split_again[0]);
+					msg_split = msg.split("-");
+					split_again = msg_split[1].split(" ");
+					worker_id = Integer.parseInt(split_again[0]);
 
-						if (!msg.contains("not found")) {
-							msg_split = msg.split("==> ");
-							longestWord = msg_split[1];
-							
-							// System.out.println(msg+"\n"+"Worker ID: "+worker_id+"\nLongest Word: "+longestWord);
-							// System.out.println(results.take());
-							MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, worker_id, workers.get(worker_id).passageName, longestWord, workers.size(), 1);
-						}
-						else {
-							MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, worker_id, workers.get(worker_id).passageName, "----", workers.size(), 0);
-						}
-						// MessageJNI.writeLongestWordResponseMsg(prefixID, prefix, passageIndex, passageName, longestWord, passageCount, present);
+					if (!msg.contains("not found")) {
+						msg_split = msg.split("==> ");
+						longestWord = msg_split[1];
+						
+						// System.out.println(msg+"\n"+"Worker ID: "+worker_id+"\nLongest Word: "+longestWord);
+						// System.out.println(results.take());
+						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, worker_id, workers.get(worker_id).passageName, longestWord, workers.size(), 1);
 					}
 					else {
-						// send results
-						// I'm not sure how
-						results.take();
+						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, worker_id, workers.get(worker_id).passageName, "----", workers.size(), 0);
 					}
+					// MessageJNI.writeLongestWordResponseMsg(prefixID, prefix, passageIndex, passageName, longestWord, passageCount, present);
 				} catch (Exception e) {}
 		}
 

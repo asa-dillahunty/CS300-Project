@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	} else if (rc == 0) {
 		// child
-		int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor");
+		int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor > PassageProcessor.log");
 		return 0;
 	}
 	// parent
@@ -93,8 +93,9 @@ int main(int argc, char** argv) {
 		for (j=0;j<responses[0].count;j++) {
 
 			// printf("%s\n",responses[j].longest_word);
+			// memmove(responses[j].longest_word, responses[j].longest_word+1, strlen(responses[j].longest_word));
 			if (responses[j].present == 1)
-				fprintf(stderr,"%ld, %d of %d, %s\n", responses[j].mtype, responses[j].index,responses[j].count,responses[j].longest_word);
+				fprintf(stderr,"%ld, %d of %d, %s\n", responses[j].mtype, responses[j].index,responses[j].count,responses[j].longest_word+1);
 			else
 				fprintf(stderr,"%ld, %d of %d, not found\n", responses[j].mtype, responses[j].index,responses[j].count);
 		}
