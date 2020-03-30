@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
 	// int status = system(final_command);
 	// let passageProcessor know I am done
 	printf("\n");
-	sendMessage("  ",0);
+	sendMessage("   ",0);
 	printf("\n");
 	
 	return 0;
