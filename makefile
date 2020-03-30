@@ -1,5 +1,5 @@
-J_OBJS = edu/cs300/PassageProcessor.class edu/cs300/PrefixManager.class edu/cs300/Worker.class edu/cs300/ResultMessage.class edu/cs300/SearchRequest.class CtCILibrary/Trie.class CtCILibrary/TrieNode.class edu/cs300/TextSamples.class edu_cs300_MessageJNI.h
-C_OBJS = searchmanager msgsnd msgrcv edu_cs300_MessageJNI.o
+J_OBJS = edu/cs300/PassageProcessor.class edu/cs300/PrefixManager.class edu/cs300/Worker.class edu/cs300/ResultMessage.class edu/cs300/SearchRequest.class edu/cs300/MessageJNI.class CtCILibrary/Trie.class CtCILibrary/TrieNode.class edu/cs300/TextSamples.class edu_cs300_MessageJNI.h
+C_OBJS = searchmanager msgsnd msgrcv libsystem5msg.so edu_cs300_MessageJNI.o
 C_COMP = -std=c99 -D_GNU_SOURCE
 
 all: $(J_OBJS) $(C_OBJS)
@@ -24,6 +24,9 @@ edu/cs300/SearchRequest.class: edu/cs300/SearchRequest.java
 edu/cs300/TextSamples.class: edu/cs300/TextSamples.java
 	javac edu/cs300/TextSamples.java
 
+edu/cs300/MessageJNI.class: edu/cs300/MessageJNI.java
+	javac edu/cs300/MessageJNI.java
+
 CtCILibrary/Trie.class: CtCILibrary/Trie.java CtCILibrary/TrieNode.java
 	javac CtCILibrary/Trie.java
 
@@ -39,10 +42,12 @@ msgsnd: msgsnd_pr.c
 msgrcv: msgrcv_lwr.c
 	gcc $(C_COMP) msgrcv_lwr.c -o msgrcv
 
+libsystem5msg.so: edu_cs300_MessageJNI.o
+	gcc -shared -o libsystem5msg.so edu_cs300_MessageJNI.o -lc
+
 edu_cs300_MessageJNI.o: system5_msg.c
 	export JAVA_HOME=/usr/java/latest
 	gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux system5_msg.c -o edu_cs300_MessageJNI.o
-	gcc -shared -o libsystem5msg.so edu_cs300_MessageJNI.o -lc
 
 testp: $(J_OBJS)
 	java -cp . -Djava.library.path=. edu.cs300.PassageProcessor
@@ -53,3 +58,4 @@ test: all
 clean:
 	rm $(J_OBJS)
 	rm $(C_OBJS)
+	rm PassageProcessor.log
