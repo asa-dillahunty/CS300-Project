@@ -94,9 +94,9 @@ int main(int argc, char** argv) {
 
 			// printf("%s\n",responses[j].longest_word);
 			if (responses[j].present == 1)
-				fprintf(stderr,"%ld, %d of %d, %s, size=%d\n", responses[j].mtype, responses[j].index,responses[j].count,responses[j].longest_word);
+				fprintf(stderr,"%ld, %d of %d, %s\n", responses[j].mtype, responses[j].index,responses[j].count,responses[j].longest_word);
 			else
-				fprintf(stderr,"%ld, %d of %d, not found, size=%d\n", responses[j].mtype, responses[j].index,responses[j].count);
+				fprintf(stderr,"%ld, %d of %d, not found\n", responses[j].mtype, responses[j].index,responses[j].count);
 		}
 
 		// printf("%s\n",argv[i]);
