@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 			// printf("%s\n",responses[j].longest_word);
 			// memmove(responses[j].longest_word, responses[j].longest_word+1, strlen(responses[j].longest_word));
 			if (responses[j].present == 1)
-				printf("Passage %d - %s - %s\n", responses[j].index,responses[j].location_description,responses[j].longest_word+2);
+				printf("Passage %d - %s - %s\n", responses[j].index,responses[j].location_description,responses[j].longest_word);
 			else
 				printf("Passage %d - %s - not found\n", responses[j].index,responses[j].location_description,responses[j].count);
 		}

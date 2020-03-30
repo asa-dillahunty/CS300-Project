@@ -61,10 +61,12 @@ public class Trie
 	}
 
 	public String longestString() {
-		return root.longestSubString();
+		// This is because the root adds some random character
+		return root.longestSubString().substring(1);
 	}
 
 	public String longestWithPrefix(String prefix) {
-		return root.longestWithPrefix(prefix);
+		// same ^
+		return root.longestWithPrefix(prefix).substring(1);
 	}
 }
