@@ -1,5 +1,6 @@
-# Compiled class files
+# Compiled java files
 *.class
+edu_cs300_MessageJNI.h
 
 # Compiled C files
 msgrcv

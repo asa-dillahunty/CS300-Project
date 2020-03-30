@@ -77,7 +77,7 @@ public class PassageProcessor {
 							MessageJNI.writeLongestWordResponseMsg(workers.get(worker_id).prefixCount, message.prefix, worker_id, workers.get(worker_id).passageName, longestWord, workers.size(), 1);
 						}
 						else {
-							MessageJNI.writeLongestWordResponseMsg(workers.get(worker_id).prefixCount, message.prefix, worker_id, workers.get(worker_id).passageName, "", workers.size(), 0);
+							MessageJNI.writeLongestWordResponseMsg(workers.get(worker_id).prefixCount, message.prefix, worker_id, workers.get(worker_id).passageName, "----", workers.size(), 0);
 						}
 						// MessageJNI.writeLongestWordResponseMsg(prefixID, prefix, passageIndex, passageName, longestWord, passageCount, present);
 					}
