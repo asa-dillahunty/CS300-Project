@@ -41,7 +41,7 @@ public class PassageProcessor {
 				} catch (Exception e) {}
 				break;
 			}
-			if (message.prefix.length() < 3) break;
+			if (message.prefix.length() < 3 || message.prefix.compareTo("   ") == 0) break;
 			System.out.println("**prefix("+message.requestID+") "+message.prefix+" recieved");
 			// **prefix(1) con received
 			try {

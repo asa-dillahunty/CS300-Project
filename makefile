@@ -49,7 +49,7 @@ edu_cs300_MessageJNI.o: system5_msg.c
 	export JAVA_HOME=/usr/java/latest
 	gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux system5_msg.c -o edu_cs300_MessageJNI.o
 
-testp: $(J_OBJS)
+pp: $(J_OBJS)
 	java -cp . -Djava.library.path=. edu.cs300.PassageProcessor
 
 test: all
