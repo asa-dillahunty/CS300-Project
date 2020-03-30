@@ -91,18 +91,24 @@ int main(int argc, char** argv) {
 		}
 
 		for (j=0;j<responses[0].count;j++) {
-			printf("%s\n",responses[j].longest_word);
+
+			// printf("%s\n",responses[j].longest_word);
+			if (responses[j].present == 1)
+				fprintf(stderr,"%ld, %d of %d, %s, size=%d\n", responses[j].mtype, responses[j].index,responses[j].count,responses[j].longest_word);
+			else
+				fprintf(stderr,"%ld, %d of %d, not found, size=%d\n", responses[j].mtype, responses[j].index,responses[j].count);
 		}
 
 		// printf("%s\n",argv[i]);
 	}
+	free(responses);
 	// char* msg = "no";
 	// final_command[0] = '\0';
 	// strcat(final_command,msg_send_command);
 	// strcat(final_command,msg);
 	// int status = system(final_command);
 	// let passageProcessor know I am done
-	sendMessage("no",0);
+	sendMessage("  ",0);
 
 	
 	return 0;
@@ -115,11 +121,6 @@ void sendMessage(char* message, int prefixID) {
 	prefix_buf sbuf;
 	size_t buf_length;
 
-	if (strlen(message) <2) {
-		printf("Error: please provide prefix of at least two characters for search\n");
-		return;
-	}
-
 	key = ftok(CRIMSON_ID,QUEUE_NUMBER);
 	if ((msqid = msgget(key, msgflg)) < 0) {
 		int errnum = errno;
@@ -127,8 +128,8 @@ void sendMessage(char* message, int prefixID) {
 		perror("(msgget)");
 		fprintf(stderr, "Error msgget: %s\n", strerror( errnum ));
 	}
-	else
-		fprintf(stderr, "msgget: msgget succeeded: msgqid = %d\n", msqid);
+	// else
+	// 	fprintf(stderr, "msgget: msgget succeeded: msgqid = %d\n", msqid);
 
 	// We'll send message type 1
 	sbuf.mtype = 1;
@@ -162,8 +163,8 @@ response_buf getMessage() {
 		perror("(msgget)");
 		fprintf(stderr, "Error msgget: %s\n", strerror( errnum ));
 	}
-	else
-		fprintf(stderr, "msgget: msgget succeeded: msgqid = %d\n", msqid);
+	// else
+	// 	fprintf(stderr, "msgget: msgget succeeded: msgqid = %d\n", msqid);
 
 
 	// msgrcv to receive message
@@ -179,10 +180,10 @@ response_buf getMessage() {
 	} while ((ret < 0 ) && (errno == 4));
 	//fprintf(stderr,"msgrcv error return code --%d:$d--",ret,errno);
 
-	if (rbuf.present == 1)
-		fprintf(stderr,"%ld, %d of %d, %s, size=%d\n", rbuf.mtype, rbuf.index,rbuf.count,rbuf.longest_word, ret);
-	else
-		fprintf(stderr,"%ld, %d of %d, not found, size=%d\n", rbuf.mtype, rbuf.index,rbuf.count, ret);
+	// if (rbuf.present == 1)
+	// 	fprintf(stderr,"%ld, %d of %d, %s, size=%d\n", rbuf.mtype, rbuf.index,rbuf.count,rbuf.longest_word, ret);
+	// else
+	// 	fprintf(stderr,"%ld, %d of %d, not found, size=%d\n", rbuf.mtype, rbuf.index,rbuf.count, ret);
 
 	return rbuf;
 }
