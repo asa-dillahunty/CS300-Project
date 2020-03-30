@@ -55,7 +55,7 @@ public class PassageProcessor {
 				try {
 					msg = results.take();
 
-					if (!msg.found) {
+					if (msg.found) {
 						// System.out.println(msg+"\n"+"Worker ID: "+worker_id+"\nLongest Word: "+longestWord);
 						// System.out.println(results.take());
 						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, msg.worker_id, workers.get(msg.worker_id).passageName, msg.longestWord, workers.size(), 1);
