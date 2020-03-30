@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	} else if (rc == 0) {
 		// child
-		int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor");
+		// int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor");
 		return 0;
 	}
 	// parent
@@ -66,8 +66,9 @@ int main(int argc, char** argv) {
 	char* msg_send_command = "./msgsnd ";
 	char final_command[100];
 
+
 	int i;
-	for (i=2;i<argc;) {
+	for (i=2;i<argc;i++) {
 		// final_command[0] = '\0';
 		// strcat(final_command,msg_send_command);
 		// strcat(final_command,argv[i]);
@@ -75,20 +76,17 @@ int main(int argc, char** argv) {
 		sendMessage(argv[i], i-1);
 		// printf("%s\n",final_command);
 		// wait secs
-		i++;
+		sleep(secs);
 
-		if (i<argc)
-			sleep(secs);
 		// printf("%s\n",argv[i]);
 	}
-	printf("Hello\n\n\n\n\n");
-	char* msg = "no";
-	final_command[0] = '\0';
-	strcat(final_command,msg_send_command);
-	strcat(final_command,msg);
-	printf("This the bitch %s\n",final_command);
-	int status = system(final_command);
+	// char* msg = "no";
+	// final_command[0] = '\0';
+	// strcat(final_command,msg_send_command);
+	// strcat(final_command,msg);
+	// int status = system(final_command);
 	// let passageProcessor know I am done
+	sendMessage("no",0);
 	
 	return 0;
 }
@@ -131,6 +129,4 @@ void sendMessage(char* message, int prefixID) {
 	}
 	else
 		fprintf(stderr,"Message(%d): \"%s\" Sent (%d bytes)\n", sbuf.id, sbuf.prefix,(int)buf_length);
-
-	exit(0);
 }
