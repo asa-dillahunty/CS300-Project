@@ -46,11 +46,16 @@ int main(int argc, char**argv)
     key_t key;
     prefix_buf sbuf;
     size_t buf_length;
+    int MessageID = 0;
 
     if (argc <= 1 || strlen(argv[1]) <2) {
         printf("Error: please provide prefix of at least two characters for search\n");
         printf("Usage: %s <prefix>\n",argv[0]);
         exit(-1);
+    }
+    else if (argc == 3) {
+        // get MessageID
+        MessageID = atoi(argv[2]);
     }
 
     key = ftok(CRIMSON_ID,QUEUE_NUMBER);
@@ -66,7 +71,7 @@ int main(int argc, char**argv)
     // We'll send message type 1
     sbuf.mtype = 1;
     strlcpy(sbuf.prefix,argv[1],WORD_LENGTH);
-    sbuf.id=0;
+    sbuf.id= MessageID;
     buf_length = strlen(sbuf.prefix) + sizeof(int)+1;//struct size without long int type
 
     // Send a message.

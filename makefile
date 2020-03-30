@@ -52,6 +52,9 @@ edu_cs300_MessageJNI.o: system5_msg.c
 pp: $(J_OBJS)
 	java -cp . -Djava.library.path=. edu.cs300.PassageProcessor
 
+ts: $(J_OBJS)
+	java -cp . -Djava.library.path=. edu.cs300.TextSamples
+
 test: all
 	./searchmanager 2 con pre wor
 
