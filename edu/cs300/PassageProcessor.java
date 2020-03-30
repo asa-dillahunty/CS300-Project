@@ -47,7 +47,10 @@ public class PassageProcessor {
 			if (message.prefix.length() < 3) break;
 			System.out.println("**prefix("+message.requestID+") "+message.prefix+" recieved");
 			// **prefix(1) con received
-			prefixQueue.add(message.prefix);
+			try {
+				prefixQueue.put(message.prefix);
+			} catch (Exception e) {}
+			System.out.println("Prefix given away ;)");
 
 			for (int i=0;i<workers.size();i++)
 				try {

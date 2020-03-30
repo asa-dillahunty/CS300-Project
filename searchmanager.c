@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <pthread.h>
 #include "longest_word_search.h"
 #include "queue_ids.h"
 
@@ -55,7 +56,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	} else if (rc == 0) {
 		// child
-		int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor false");
+		int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor");
 		return 0;
 	}
 	// parent
@@ -71,7 +72,7 @@ int main(int argc, char** argv) {
 		// strcat(final_command,msg_send_command);
 		// strcat(final_command,argv[i]);
 		// int status = system(final_command);
-		sendMessage(argv[i], i-2);
+		sendMessage(argv[i], i-1);
 		// printf("%s\n",final_command);
 		// wait secs
 		i++;
@@ -80,13 +81,14 @@ int main(int argc, char** argv) {
 			sleep(secs);
 		// printf("%s\n",argv[i]);
 	}
-
-	// let passageProcessor know I am done
+	printf("Hello\n\n\n\n\n");
+	char* msg = "no";
 	final_command[0] = '\0';
 	strcat(final_command,msg_send_command);
-	strcat(final_command,"no");
+	strcat(final_command,msg);
+	printf("This the bitch %s\n",final_command);
 	int status = system(final_command);
-
+	// let passageProcessor know I am done
 	
 	return 0;
 }
