@@ -87,7 +87,6 @@ public class PassageProcessor {
 						results.take();
 					}
 				} catch (Exception e) {}
-				break;
 
 		}
 

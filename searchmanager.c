@@ -41,6 +41,7 @@ strlcpy(char       *dst,        /* O - Destination string */
 #endif
 
 void sendMessage(char* message, int prefixID);
+response_buf getMessage();
 
 // Format:
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
