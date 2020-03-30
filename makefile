@@ -32,7 +32,7 @@ msgsnd: msgsnd_pr.c
 msgrcv: msgrcv_lwr.c
 	gcc $(C_COMP) msgrcv_lwr.c -o msgrcv
 
-testp: all
+testp: $(J_OBJS)
 	java -cp . -Djava.library.path=. edu.cs300.PassageProcessor
 
 test: all

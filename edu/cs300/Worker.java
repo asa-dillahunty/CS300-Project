@@ -13,6 +13,7 @@ class Worker extends Thread {
 	String passageName;
 	String passagePath;
 	Boolean running;
+	int prefixCount;
 
 	public Worker(String path,int id,ArrayBlockingQueue<String> prefix, ArrayBlockingQueue<String> results){
 		// this.textTrieTree=new Trie(words);
@@ -26,6 +27,7 @@ class Worker extends Thread {
 
 		this.passagePath = path;
 		this.running = true;
+		this.prefixCount = 1;
 	}
 
 	public ArrayList<String> getWordList() {
@@ -68,11 +70,13 @@ class Worker extends Thread {
 				
 				if (!found){
 					//System.out.println("Worker-"+this.id+" "+req.requestID+":"+ prefix+" ==> not found ");
-					resultsOutputArray.put(passageName+":"+prefix+" not found");
+					resultsOutputArray.put("Worker-"+this.id+" "+this.prefixCount+":"+prefix+" ==> not found");
 				} else{
 					//System.out.println("Worker-"+this.id+" "+req.requestID+":"+ prefix+" ==> "+word);
-					resultsOutputArray.put(passageName+":"+prefix+" found : "+this.textTrieTree.longestWithPrefix(prefix));
+					resultsOutputArray.put("Worker-"+this.id+" "+this.prefixCount+":"+prefix+" ==> "+this.textTrieTree.longestWithPrefix(prefix));
 				}
+
+				this.prefixCount++;
 				
 			} catch(InterruptedException e){
 				System.out.println(e.getMessage());

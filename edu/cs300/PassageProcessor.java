@@ -12,6 +12,7 @@ public class PassageProcessor {
 	public static void main(String[] args) {
 		boolean printing = true;
 		if (args.length > 0) printing = false;
+		// int prefixCount = 0;
 
 		ArrayList<Worker> workers = new ArrayList<Worker>();
 		ArrayBlockingQueue<String> results = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
@@ -49,13 +50,36 @@ public class PassageProcessor {
 			// **prefix(1) con received
 			try {
 				prefixQueue.put(message.prefix);
+				// prefixCount++;
+				// prefixQueue.put("con");
 			} catch (Exception e) {}
-			System.out.println("Prefix given away ;)");
 
+			String msg;
+			int worker_id;
+			String longestWord;
+			String[] msg_split;
+			String[] split_again;
 			for (int i=0;i<workers.size();i++)
 				try {
 					if (printing) {
-						System.out.println(results.take());
+						msg = results.take();
+
+						msg_split = msg.split("-");
+						split_again = msg_split[1].split(" ");
+						worker_id = Integer.parseInt(split_again[0]);
+
+						if (!msg.contains("not found")) {
+							msg_split = msg.split("==> ");
+							longestWord = msg_split[1];
+							
+							// System.out.println(msg+"\n"+"Worker ID: "+worker_id+"\nLongest Word: "+longestWord);
+							// System.out.println(results.take());
+							MessageJNI.writeLongestWordResponseMsg(workers.get(worker_id).prefixCount, message.prefix, worker_id, workers.get(worker_id).passageName, longestWord, workers.size(), 1);
+						}
+						else {
+							MessageJNI.writeLongestWordResponseMsg(workers.get(worker_id).prefixCount, message.prefix, worker_id, workers.get(worker_id).passageName, "", workers.size(), 0);
+						}
+						// MessageJNI.writeLongestWordResponseMsg(prefixID, prefix, passageIndex, passageName, longestWord, passageCount, present);
 					}
 					else {
 						// send results
@@ -63,6 +87,7 @@ public class PassageProcessor {
 						results.take();
 					}
 				} catch (Exception e) {}
+				break;
 
 		}
 

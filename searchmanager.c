@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	} else if (rc == 0) {
 		// child
-		// int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor");
+		int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor false");
 		return 0;
 	}
 	// parent
