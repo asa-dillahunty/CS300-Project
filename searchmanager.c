@@ -93,6 +93,7 @@ int main(int argc, char** argv) {
 			responses[response.index] = response;
 		}
 
+		printf("Report \"%s\"",argv[i]);
 		for (j=0;j<responses[0].count;j++) {
 
 			// printf("%s\n",responses[j].longest_word);
