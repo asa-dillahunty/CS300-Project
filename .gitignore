@@ -7,6 +7,10 @@ msgrcv
 msgsnd
 searchmanager
 *.o
+libsystem5msg.so
 
 # Mac OS stuff
 .DS_Store
+
+# log files
+*.log
