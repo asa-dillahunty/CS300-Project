@@ -11,7 +11,7 @@ public class PassageProcessor {
 
 	public static void main(String[] args) {
 		ArrayList<Worker> workers = new ArrayList<Worker>();
-		ArrayBlockingQueue<String> results = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
+		ArrayBlockingQueue<ResultMessage> results = new ArrayBlockingQueue<ResultMessage>(BLOCK_QUEUE_SIZE);
 		ArrayBlockingQueue<String> prefixQueue = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
 		// ArrayBlockingQueue prefixRequestArray;
 		
@@ -50,29 +50,18 @@ public class PassageProcessor {
 				// prefixQueue.put("con");
 			} catch (Exception e) {}
 
-			String msg;
-			int worker_id;
-			String longestWord;
-			String[] msg_split;
-			String[] split_again;
+			ResultMessage msg;
 			for (int i=0;i<workers.size();i++)
 				try {
 					msg = results.take();
 
-					msg_split = msg.split("-");
-					split_again = msg_split[1].split(" ");
-					worker_id = Integer.parseInt(split_again[0]);
-
-					if (!msg.contains("not found")) {
-						msg_split = msg.split("==> ");
-						longestWord = msg_split[1];
-						
+					if (!msg.found) {
 						// System.out.println(msg+"\n"+"Worker ID: "+worker_id+"\nLongest Word: "+longestWord);
 						// System.out.println(results.take());
-						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, worker_id, workers.get(worker_id).passageName, longestWord, workers.size(), 1);
+						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, msg.worker_id, workers.get(msg.worker_id).passageName, msg.longestWord, workers.size(), 1);
 					}
 					else {
-						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, worker_id, workers.get(worker_id).passageName, "----", workers.size(), 0);
+						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, msg.worker_id, workers.get(msg.worker_id).passageName, "----", workers.size(), 0);
 					}
 					// MessageJNI.writeLongestWordResponseMsg(prefixID, prefix, passageIndex, passageName, longestWord, passageCount, present);
 				} catch (Exception e) {}
@@ -91,35 +80,35 @@ public class PassageProcessor {
 			}
 		}
 	}
+}
 
-	static class PrefixManager extends Thread {
-		public ArrayBlockingQueue<String> prefixes;
-		public ArrayList<Worker> workers;
+class PrefixManager extends Thread {
+	public ArrayBlockingQueue<String> prefixes;
+	public ArrayList<Worker> workers;
 
-		public PrefixManager(ArrayBlockingQueue<String> prefixes, ArrayList<Worker> workers) {
-			this.prefixes = prefixes;
-			this.workers = workers;
-		}
+	public PrefixManager(ArrayBlockingQueue<String> prefixes, ArrayList<Worker> workers) {
+		this.prefixes = prefixes;
+		this.workers = workers;
+	}
 
-		public void run() {
-			String prefix = "*";
-			
-			while (true) {
-				try {
-					prefix = prefixes.take(); 
-				} catch (Exception e) {break;}
+	public void run() {
+		String prefix = "*";
+		
+		while (true) {
+			try {
+				prefix = prefixes.take(); 
+			} catch (Exception e) {break;}
 
-				if (prefix.length() < 3) break;
+			if (prefix.length() < 3) break;
 
-				for (Worker slave : workers) {
-					slave.prefixRequestArray.add(prefix);
-				}
-			}
-			
 			for (Worker slave : workers) {
-				slave.kill();
-				slave.prefixRequestArray.add("");
+				slave.prefixRequestArray.add(prefix);
 			}
+		}
+		
+		for (Worker slave : workers) {
+			slave.kill();
+			slave.prefixRequestArray.add("");
 		}
 	}
 }

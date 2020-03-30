@@ -8,14 +8,14 @@ import java.io.File;
 class Worker extends Thread {
 	Trie textTrieTree;
 	ArrayBlockingQueue<String> prefixRequestArray;
-	ArrayBlockingQueue<String> resultsOutputArray;
+	ArrayBlockingQueue<ResultMessage> resultsOutputArray;
 	int id;
 	String passageName;
 	String passagePath;
 	Boolean running;
 	int prefixCount;
 
-	public Worker(String path,int id,ArrayBlockingQueue<String> prefix, ArrayBlockingQueue<String> results){
+	public Worker(String path,int id,ArrayBlockingQueue<String> prefix, ArrayBlockingQueue<ResultMessage> results){
 		// this.textTrieTree=new Trie(words);
 		this.textTrieTree = null;
 		this.prefixRequestArray=prefix;
@@ -65,15 +65,17 @@ class Worker extends Thread {
 				// System.out.println("Worker");
 				String prefix = this.prefixRequestArray.take();
 				if (prefix.length()<3) break;
+				String word;
 
 				boolean found = this.textTrieTree.contains(prefix);
 				
 				if (!found){
-					//System.out.println("Worker-"+this.id+" "+req.requestID+":"+ prefix+" ==> not found ");
-					resultsOutputArray.put("Worker-"+this.id+" "+this.prefixCount+":"+prefix+" ==> not found");
+					System.out.println("Worker-"+this.id+" "+prefixCount+":"+ prefix+" ==> not found ");
+					resultsOutputArray.put(new ResultMessage(this.id, "",false));
 				} else{
-					//System.out.println("Worker-"+this.id+" "+req.requestID+":"+ prefix+" ==> "+word);
-					resultsOutputArray.put("Worker-"+this.id+" "+this.prefixCount+":"+prefix+" ==> "+this.textTrieTree.longestWithPrefix(prefix));
+					word = this.textTrieTree.longestWithPrefix(prefix);
+					System.out.println("Worker-"+this.id+" "+prefixCount+":"+ prefix+" ==> "+word);
+					resultsOutputArray.put(new ResultMessage(this.id,word,true));
 				}
 
 				this.prefixCount++;
@@ -88,4 +90,16 @@ class Worker extends Thread {
 		running = false;
 	}
 
+}
+
+class ResultMessage {
+	public int worker_id;
+	public String longestWord;
+	public boolean found;
+
+	public ResultMessage(int id, String word, boolean found) {
+		this.worker_id = id;
+		this.longestWord = word;
+		this.found = found;
+	}
 }
