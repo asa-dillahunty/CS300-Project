@@ -1,5 +1,5 @@
 J_OBJS = edu/cs300/PassageProcessor.class edu/cs300/Worker.class CtCILibrary/Trie.class CtCILibrary/TrieNode.class edu/cs300/TextSamples.class edu_cs300_MessageJNI.h
-C_OBJS = searchmanager msgsnd msgrcv
+C_OBJS = searchmanager msgsnd msgrcv edu_cs300_MessageJNI.o
 C_COMP = -std=c99 -D_GNU_SOURCE
 
 all: $(J_OBJS) $(C_OBJS)
@@ -31,6 +31,11 @@ msgsnd: msgsnd_pr.c
 
 msgrcv: msgrcv_lwr.c
 	gcc $(C_COMP) msgrcv_lwr.c -o msgrcv
+
+edu_cs300_MessageJNI.o: system5_msg.c
+	export JAVA_HOME=/usr/java/latest
+	gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux system5_msg.c -o edu_cs300_MessageJNI.o
+	gcc -shared -o libsystem5msg.so edu_cs300_MessageJNI.o -lc
 
 testp: $(J_OBJS)
 	java -cp . -Djava.library.path=. edu.cs300.PassageProcessor

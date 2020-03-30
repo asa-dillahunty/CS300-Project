@@ -74,7 +74,9 @@ int main(int argc, char** argv) {
 		// strcat(final_command,msg_send_command);
 		// strcat(final_command,argv[i]);
 		// int status = system(final_command);
+		printf("\n");
 		sendMessage(argv[i], i-1);
+		printf("\n");
 		// printf("%s\n",final_command);
 		// wait secs
 		sleep(secs);
@@ -95,9 +97,9 @@ int main(int argc, char** argv) {
 			// printf("%s\n",responses[j].longest_word);
 			// memmove(responses[j].longest_word, responses[j].longest_word+1, strlen(responses[j].longest_word));
 			if (responses[j].present == 1)
-				fprintf(stderr,"%ld, %d of %d, %s\n", responses[j].mtype, responses[j].index,responses[j].count,responses[j].longest_word+1);
+				printf("Passage %d - %s - %s\n", responses[j].index,responses[j].location_description,responses[j].longest_word+2);
 			else
-				fprintf(stderr,"%ld, %d of %d, not found\n", responses[j].mtype, responses[j].index,responses[j].count);
+				printf("Passage %d - %s - not found\n", responses[j].index,responses[j].location_description,responses[j].count);
 		}
 
 		// printf("%s\n",argv[i]);
@@ -109,8 +111,9 @@ int main(int argc, char** argv) {
 	// strcat(final_command,msg);
 	// int status = system(final_command);
 	// let passageProcessor know I am done
+	printf("\n");
 	sendMessage("  ",0);
-
+	printf("\n");
 	
 	return 0;
 }
@@ -147,7 +150,7 @@ void sendMessage(char* message, int prefixID) {
 		exit(1);
 	}
 	else
-		fprintf(stderr,"Message(%d): \"%s\" Sent (%d bytes)\n", sbuf.id, sbuf.prefix,(int)buf_length);
+		printf("Message(%d): \"%s\" Sent (%d bytes)\n", sbuf.id, sbuf.prefix,(int)buf_length);
 }
 
 response_buf getMessage() {
