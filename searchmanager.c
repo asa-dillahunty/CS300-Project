@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
 	sendMessage("   ",0);
 	printf("\n");
 
-	printf("Exiting ...");
+	printf("Exiting ...\n");
 	
 	return 0;
 }

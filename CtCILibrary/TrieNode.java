@@ -117,7 +117,7 @@ public class TrieNode {
 		for (char key : keyset) {
 			subString = children.get(key).longestSubString();
 			if (subString.length() > longestSubString.length()) longestSubString = subString;
-			else if (subString.length() >= longestSubString.length()) {
+			else if (subString.length() == longestSubString.length()) {
 				if (subString.compareTo(longestSubString) > 0) longestSubString = subString;
 			}
 		}
