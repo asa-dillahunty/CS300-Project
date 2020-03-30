@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	} else if (rc == 0) {
 		// child
-		int status = system("java -cp . -Djava.library.path=. edu.cs300.PassageProcessor > PassageProcessor.log");
+		int status = system("make pp > PassageProcessor.log");
 		return 0;
 	}
 	// parent
@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
 		// printf("%s\n",final_command);
 		// wait secs
 		sleep(secs);
+
 		response = getMessage();
 		if (responses == NULL) {
 			responses = (response_buf*) malloc(sizeof(response_buf)*response.count);
@@ -92,6 +93,7 @@ int main(int argc, char** argv) {
 			responses[response.index] = response;
 		}
 
+		printf("Report \"%s\"",argv[i]);
 		for (j=0;j<responses[0].count;j++) {
 
 			// printf("%s\n",responses[j].longest_word);
@@ -99,7 +101,7 @@ int main(int argc, char** argv) {
 			if (responses[j].present == 1)
 				printf("Passage %d - %s - %s\n", responses[j].index,responses[j].location_description,responses[j].longest_word);
 			else
-				printf("Passage %d - %s - not found\n", responses[j].index,responses[j].location_description,responses[j].count);
+				printf("Passage %d - %s - not found\n", responses[j].index,responses[j].location_description);
 		}
 
 		// printf("%s\n",argv[i]);
@@ -114,6 +116,8 @@ int main(int argc, char** argv) {
 	printf("\n");
 	sendMessage("   ",0);
 	printf("\n");
+
+	printf("Exiting ...");
 	
 	return 0;
 }
