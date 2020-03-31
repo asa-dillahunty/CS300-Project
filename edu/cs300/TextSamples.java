@@ -10,7 +10,12 @@ public class TextSamples extends Thread {
 
 		Runtime runtime = Runtime.getRuntime();
 		try {
-			Process proc = runtime.exec("make pp > log.txt");
+			Process proc = runtime.exec("make pp");
+			InputStream in = proc.getInputStream();
+			in.transferTo(System.out);
+			proc.wait();
+
+
 			ts.join();
 		} catch(Exception e) {}
 			

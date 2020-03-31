@@ -59,6 +59,6 @@ test: all
 	./searchmanager 2 con pre wor
 
 clean:
-	rm $(J_OBJS)
-	rm $(C_OBJS)
-	rm PassageProcessor.log
+	rm -f $(J_OBJS)
+	rm -f  $(C_OBJS)
+	rm -f PassageProcessor.log
