@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
 	} else if (rc == 0) {
 		// child
 		int status = system("make pp > PassageProcessor.log");
+		// int status = system("make pp");
 		return 0;
 	}
 	// parent
