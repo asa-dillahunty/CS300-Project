@@ -42,12 +42,29 @@ strlcpy(char       *dst,        /* O - Destination string */
 
 void sendMessage(char* message, int prefixID);
 response_buf getMessage();
+void sighandler(int);
+
+pthread_mutex_t lock;
+char** prefixes;
+int passageCount;
+int prefixIndex;
+int completedSearches;
+int numPrefixes;
 
 // Format:
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
 
 int main(int argc, char** argv) {
 	if (argc < 3) return 0;
+	prefixes = argv;
+	numPrefixes = argc;
+
+	pthread_mutex_init(&lock, NULL);
+	prefixIndex = 0;
+	completedSearches = 0;
+
+	signal(SIGINT, sighandler);
+
 	int secs; // seconds between sending prefix requests
 
 	int rc = fork();
@@ -65,9 +82,8 @@ int main(int argc, char** argv) {
 
 	secs = atoi(argv[1]);
 	// printf("Parsed: %d, Original: %s\n",secs,argv[1]);
-
-	response_buf response;
 	response_buf* responses = NULL;
+	response_buf response;
 
 	int i;
 	for (i=2;i<argc;i++) {
@@ -83,16 +99,31 @@ int main(int argc, char** argv) {
 		sleep(secs);
 
 		response = getMessage();
-		if (responses == NULL) {
+
+		pthread_mutex_lock(&lock);
+		passageCount = response.count;
+		completedSearches++;
+		pthread_mutex_unlock(&lock);
+
+		if (responses == NULL)
 			responses = (response_buf*) malloc(sizeof(response_buf)*response.count);
-		}
 
 		responses[response.index] = response;
+
 		int j;
 		for (j=1;j<response.count;j++) {
 			response = getMessage();
+
+			pthread_mutex_lock(&lock);
+			completedSearches++;
+			pthread_mutex_unlock(&lock);
+
 			responses[response.index] = response;
 		}
+
+		pthread_mutex_lock(&lock);
+		prefixIndex++;
+		pthread_mutex_unlock(&lock);
 
 		printf("Report \"%s\"\n",argv[i]);
 		for (j=0;j<responses[0].count;j++) {
@@ -104,10 +135,11 @@ int main(int argc, char** argv) {
 			else
 				printf("Passage %d - %s - not found\n", responses[j].index,responses[j].location_description);
 		}
-
 		// printf("%s\n",argv[i]);
 	}
 	free(responses);
+
+	pthread_mutex_destroy(&lock);
 	// char* msg = "no";
 	// final_command[0] = '\0';
 	// strcat(final_command,msg_send_command);
@@ -195,4 +227,24 @@ response_buf getMessage() {
 	// 	fprintf(stderr,"%ld, %d of %d, not found, size=%d\n", rbuf.mtype, rbuf.index,rbuf.count, ret);
 
 	return rbuf;
+}
+
+void sighandler(int x) {
+	pthread_mutex_lock(&lock);
+	int i;
+	if (completedSearches == 0) {
+		for (i=2;i<numPrefixes;i++) {
+			printf("%s - pending\n",prefixes[i]);
+		}
+	}
+	else {
+		if (completedSearches/passageCount > i-2) // passed
+			printf("%s - done\n",prefixes[i]);
+		else if (completedSearches/passageCount == i-2) // current prefix
+			printf("%s - %d of %d\n",prefixes[i],completedSearches%passageCount,passageCount);
+		else
+			printf("%s - pending\n"); // future
+	}
+	pthread_mutex_unlock(&lock);
+	exit(1);
 }
