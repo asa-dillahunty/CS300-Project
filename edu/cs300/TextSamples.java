@@ -1,21 +1,15 @@
 package edu.cs300;
 
 import java.io.*;
+import java.lang.*;
 import java.util.Scanner;
 
 public class TextSamples extends Thread {
 	public static void main(String[] args) {
 		TextSamples ts = new TextSamples();
 		ts.start();
-
-		Runtime runtime = Runtime.getRuntime();
+		PassageProcessor.ProcessPassages();
 		try {
-			Process proc = runtime.exec("make pp");
-			InputStream in = proc.getInputStream();
-			in.transferTo(System.out);
-			proc.wait();
-
-
 			ts.join();
 		} catch(Exception e) {}
 			

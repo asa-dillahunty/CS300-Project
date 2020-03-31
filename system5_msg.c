@@ -185,13 +185,13 @@ JNIEXPORT void JNICALL Java_edu_cs300_MessageJNI_writeLongestWordResponseMsg
     // Send a message.
     if((msgsnd(msqid, &rbuf, buffer_length, IPC_NOWAIT)) < 0) {
         int errnum = errno;
-
+	printf("\nSomething went wrong\n\n");
         perror("(msgsnd)");
         fprintf(stderr, "Error sending msg: %s\n", strerror( errnum ));
         exit(1);
     }
-    //else
-    //    fprintf(stderr,"Message: \"%d:%s\" Sent\n",rbuf.index, rbuf.longest_word);
+    else
+        fprintf(stderr,"Message: \"%d:%s\" Sent\n",rbuf.index, rbuf.longest_word);
 
 
     (*env)->ReleaseStringUTFChars(env, prefixStr, prefix);

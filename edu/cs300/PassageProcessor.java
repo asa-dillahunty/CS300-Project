@@ -9,7 +9,7 @@ public class PassageProcessor {
 	private static String PASSAGES_PATHS = "passages.txt";
 	private static int BLOCK_QUEUE_SIZE = 10;
 
-	public static void main(String[] args) {
+	public static void ProcessPassages() {
 		ArrayList<Worker> workers = new ArrayList<Worker>();
 		ArrayBlockingQueue<ResultMessage> results = new ArrayBlockingQueue<ResultMessage>(BLOCK_QUEUE_SIZE);
 		ArrayBlockingQueue<String> prefixQueue = new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE);
@@ -79,6 +79,10 @@ public class PassageProcessor {
 				System.out.println("Worker("+slave.id+") failed to join.");
 			}
 		}
+	}
+
+	public static void main(String[] args) {
+		ProcessPassages();
 	}
 }
 

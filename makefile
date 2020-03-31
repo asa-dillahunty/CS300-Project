@@ -24,7 +24,7 @@ edu/cs300/SearchRequest.class: edu/cs300/SearchRequest.java
 edu/cs300/TextSamples.class: edu/cs300/TextSamples.java
 	javac edu/cs300/TextSamples.java
 
-edu/cs300/MessageJNI.class: edu/cs300/MessageJNI.java
+edu/cs300/MessageJNI.class: edu/cs300/MessageJNI.java 
 	javac edu/cs300/MessageJNI.java
 
 CtCILibrary/Trie.class: CtCILibrary/Trie.java CtCILibrary/TrieNode.java
@@ -49,11 +49,11 @@ edu_cs300_MessageJNI.o: system5_msg.c
 	export JAVA_HOME=/usr/java/latest
 	gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux system5_msg.c -o edu_cs300_MessageJNI.o
 
-pp: $(J_OBJS)
-	java -cp . -Djava.library.path=. edu.cs300.PassageProcessor
+pp: $(J_OBJS) libsystem5msg.so
+	java -cp . -Djava.library.path=. edu.cs300.PassageProcessor 2>/dev/null
 
 ts: $(J_OBJS)
-	java -cp . -Djava.library.path=. edu.cs300.TextSamples
+	java -cp . -Djava.library.path=. edu.cs300.TextSamples 2>/dev/null
 
 test: all
 	./searchmanager 2 con pre wor
