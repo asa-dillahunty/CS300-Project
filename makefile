@@ -1,6 +1,6 @@
 J_OBJS = edu/cs300/PassageProcessor.class edu/cs300/PrefixManager.class edu/cs300/Worker.class edu/cs300/ResultMessage.class edu/cs300/SearchRequest.class edu/cs300/MessageJNI.class CtCILibrary/Trie.class CtCILibrary/TrieNode.class edu/cs300/TextSamples.class edu_cs300_MessageJNI.h
 C_OBJS = searchmanager msgsnd msgrcv libsystem5msg.so edu_cs300_MessageJNI.o
-C_COMP = -std=c99 -D_GNU_SOURCE
+C_COMP = -std=c99 -Wall -D_GNU_SOURCE
 
 all: $(J_OBJS) $(C_OBJS)
 
@@ -54,6 +54,10 @@ pp: $(J_OBJS) libsystem5msg.so
 
 ts: $(J_OBJS)
 	java -cp . -Djava.library.path=. edu.cs300.TextSamples 2>/dev/null
+
+sendj: SendMessage.java
+	javac SendMessage.java
+	java -cp . -Djava.library.path=. SendMessage
 
 test: all
 	./searchmanager 2 con pre wor

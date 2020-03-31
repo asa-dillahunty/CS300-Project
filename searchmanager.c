@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <pthread.h>
+#include <signal.h>
 #include "longest_word_search.h"
 #include "queue_ids.h"
 
@@ -76,7 +77,10 @@ int main(int argc, char** argv) {
 		// child
 		int status = system("make pp > PassageProcessor.log");
 		// int status = system("make pp");
-		return 0;
+		if (status == -1) // I don't know what status is
+			return 0;
+		else
+			return 0;
 	}
 	// parent
 
@@ -195,7 +199,7 @@ response_buf getMessage() {
 	int msgflg = IPC_CREAT | 0666;
 	key_t key;
 	response_buf rbuf;
-	size_t buf_length;
+	// size_t buf_length;
 
 	key = ftok(CRIMSON_ID,QUEUE_NUMBER);
 	if ((msqid = msgget(key, msgflg)) < 0) {
@@ -232,19 +236,17 @@ response_buf getMessage() {
 void sighandler(int x) {
 	pthread_mutex_lock(&lock);
 	int i;
-	if (completedSearches == 0) {
-		for (i=2;i<numPrefixes;i++) {
+	if (completedSearches == 0)
+		for (i=2;i<numPrefixes;i++)
 			printf("%s - pending\n",prefixes[i]);
-		}
-	}
-	else {
-		if (completedSearches/passageCount > i-2) // passed
-			printf("%s - done\n",prefixes[i]);
-		else if (completedSearches/passageCount == i-2) // current prefix
-			printf("%s - %d of %d\n",prefixes[i],completedSearches%passageCount,passageCount);
-		else
-			printf("%s - pending\n"); // future
-	}
+	else
+		for (i=2;i<numPrefixes;i++)
+			if (completedSearches/passageCount > i-2) // passed
+				printf("%s - done\n",prefixes[i]);
+			else if (completedSearches/passageCount == i-2) // current prefix
+				printf("%s - %d of %d\n",prefixes[i],completedSearches%passageCount,passageCount);
+			else
+				printf("%s - pending\n",prefixes[i]); // future
+	
 	pthread_mutex_unlock(&lock);
-	exit(1);
 }
