@@ -58,6 +58,9 @@ ts: $(J_OBJS)
 test: all
 	./searchmanager 2 con pre wor
 
+testFast: all
+	./searchmanager 0 con pre wor gib fig tree node mad had cat
+
 clean:
 	rm -f $(J_OBJS)
 	rm -f  $(C_OBJS)

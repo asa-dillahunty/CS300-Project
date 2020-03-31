@@ -47,7 +47,6 @@ void sighandler(int);
 pthread_mutex_t lock;
 char** prefixes;
 int passageCount;
-int prefixIndex;
 int completedSearches;
 int numPrefixes;
 
@@ -60,7 +59,6 @@ int main(int argc, char** argv) {
 	numPrefixes = argc;
 
 	pthread_mutex_init(&lock, NULL);
-	prefixIndex = 0;
 	completedSearches = 0;
 
 	signal(SIGINT, sighandler);
