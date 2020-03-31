@@ -123,10 +123,6 @@ int main(int argc, char** argv) {
 			responses[response.index] = response;
 		}
 
-		pthread_mutex_lock(&lock);
-		prefixIndex++;
-		pthread_mutex_unlock(&lock);
-
 		printf("Report \"%s\"\n",argv[i]);
 		for (j=0;j<responses[0].count;j++) {
 
@@ -241,7 +237,7 @@ void sighandler(int x) {
 		for (i=2;i<numPrefixes;i++)
 			if (completedSearches/passageCount > i-2) // passed
 				printf("%s - done\n",prefixes[i]);
-			else if (completedSearches/passageCount == i-2) // current prefix
+			else if (completedSearches/passageCount == i-2 && completedSearches%passageCount != 0) // current prefix
 				printf("%s - %d of %d\n",prefixes[i],completedSearches%passageCount,passageCount);
 			else
 				printf("%s - pending\n",prefixes[i]); // future
