@@ -66,7 +66,8 @@ int main(int argc, char** argv) {
 
 	int secs; // seconds between sending prefix requests
 
-	int rc = fork();
+	// int rc = fork();
+	int rc = 1;
 
 	if (rc < 0) {
 		fprintf(stderr, "fork failed\n");
