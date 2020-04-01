@@ -51,6 +51,11 @@ public class Trie
 		return root;
 	}
 
+	/**
+	 * Asa wrote the funtions after this point
+	 * 
+	 */
+
 	public int maxDepth() {
 		return root.maxDepth();
 	}

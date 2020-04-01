@@ -59,6 +59,10 @@ sem_t searchesCompleted;
 
 // Format:
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
+/**
+ * This is where the magic happens baby
+ * 
+ */
 int main(int argc, char** argv) {
 
 	if (argc < 3) {

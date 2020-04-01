@@ -1,3 +1,7 @@
+/**
+ * This was supplied by Dr. Anderson
+ */
+
 #ifndef LWS_H
 #define LWS_H
 

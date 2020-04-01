@@ -1,7 +1,6 @@
 package CtCILibrary;
 
 import java.util.HashMap;
-// import java.util.Iterator;
 import java.util.Set;
 
 /* One node in the trie. Most of the logic of the trie is implemented
@@ -75,6 +74,10 @@ public class TrieNode {
 		terminates = t;
 	}
 
+	/**
+	 * Asa wrote the funtions after this point
+	 * 
+	 */
 	public int maxDepth() {
 		if (children == null) return 0;
 
