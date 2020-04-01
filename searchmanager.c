@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <semaphore.h>
+#include <ctype.h>
 #include "longest_word_search.h"
 #include "queue_ids.h"
 
@@ -188,19 +189,20 @@ int main(int argc, char** argv) {
  */
 int validPrefix(char* prefix, int main) {
 	int length = strlen(prefix);
-	if (length < 3 || length > 20) 
+	if (length < 3 || length > 20) {
 		if (main == 1) {
-			fprintf(stderr,"\"%s\" is an invalid prefix.",prefix);
+			fprintf(stderr,"\"%s\" is an invalid prefix.\n",prefix);
 			return 0;
 		}
 		else return 0;
+	}
 	
 	char care;
 	for (int i=0;i<length;i++) {
 		care = prefix[i];
 		if ((care >= 'A' && care <= 'Z') || (care >= 'a' && care <= 'z')) continue;
 		else if (main == 1) {
-			fprintf(stderr,"\"%s\" is an invalid prefix.",prefix);
+			fprintf(stderr,"\"%s\" is an invalid prefix.\n",prefix);
 			return 0;
 		}
 		else return 0;
@@ -227,7 +229,7 @@ int validPrefix(char* prefix, int main) {
 char** getValidPrefixes(char** argv, int* argc, int main) {
 	
 	int c,j;
-	for (c=0;c<argc;c++)
+	for (c=0;c<(*argc);c++)
 		for (j=0;j<strlen(argv[c]);j++)
 			argv[c][j] = tolower(argv[c][j]);
 
