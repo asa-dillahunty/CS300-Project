@@ -6,6 +6,7 @@
 J_OBJS = edu/cs300/PassageProcessor.class edu/cs300/PrefixManager.class edu/cs300/Worker.class edu/cs300/ResultMessage.class edu/cs300/SearchRequest.class edu/cs300/MessageJNI.class CtCILibrary/Trie.class CtCILibrary/TrieNode.class edu/cs300/TextSamples.class edu_cs300_MessageJNI.h
 C_OBJS = searchmanager msgsnd msgrcv libsystem5msg.so edu_cs300_MessageJNI.o
 C_COMP = -std=c99 -Wall -D_GNU_SOURCE
+SEM_COMP = -lpthread -lrt
 
 all: $(J_OBJS) $(C_OBJS)
 
@@ -39,7 +40,7 @@ CtCILibrary/TrieNode.class: CtCILibrary/TrieNode.java
 	javac CtCILibrary/TrieNode.java
 
 searchmanager: searchmanager.c $(J_OBJS)
-	gcc $(C_COMP) searchmanager.c -o searchmanager
+	gcc $(C_COMP) $(SEM_COMP) searchmanager.c -o searchmanager
 
 msgsnd: msgsnd_pr.c
 	gcc $(C_COMP) msgsnd_pr.c -o msgsnd

@@ -43,41 +43,38 @@ strlcpy(char       *dst,        /* O - Destination string */
 #endif
 
 int validPrefix(char* prefix);
+char** getValidPrefixes(char** argv, int* argc);
 void sendMessage(char* message, int prefixID);
 response_buf getMessage();
 void sighandler(int);
 
-pthread_mutex_t lock;
 char** prefixes;
-int passageCount;
-int completedSearches;
 int numPrefixes;
-int initialized;
 
-sem_t something;
-
+sem_t validPrefixIndex;
+sem_t searchesCompleted;
+sem_t count_of_passages;
 // Format:
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
 
 int main(int argc, char** argv) {
-	int i;
-	sem_init(&something,0,1);
-	printf("Semaphore val: %d",sem_getvalue(&something,&i));
-	sem_post(&something);
-	printf("Semaphore val: %d",sem_getvalue(&something,&i));
-	int x;
-	sem_getvalue(&something,&x);
 
 	if (argc < 3) {
 		fprintf(stderr,"No valid prefixes.\n");
 		return 0;
 	}
+	int i;
+	sem_init(&validPrefixIndex,0,0);
+	sem_init(&searchesCompleted,0,0);
 
 	prefixes = argv;
 	numPrefixes = argc;
-	initialized = 0;
 	signal(SIGINT, sighandler);
+	
+	argv = getValidPrefixes(prefixes,&argc);
 
+	
+	
 	// int newSize = argc;
 	// char** new_argv = getValidPrefixes(argv,&newSize);
 
@@ -89,10 +86,6 @@ int main(int argc, char** argv) {
 	// prefixes = argv;
 	// numPrefixes = argc;
 
-	pthread_mutex_init(&lock, NULL);
-	completedSearches = 0;
-
-	// signal(SIGINT, sighandler);
 
 	int secs; // seconds between sending prefix requests
 
@@ -131,25 +124,19 @@ int main(int argc, char** argv) {
 		sleep(secs);
 
 		response = getMessage();
+		sem_post(&searchesCompleted);
 
-		pthread_mutex_lock(&lock);
-		passageCount = response.count;
-		completedSearches++;
-		pthread_mutex_unlock(&lock);
-
-		if (responses == NULL)
+		if (responses == NULL) {
+			sem_init(&count_of_passages,0,response.count);
 			responses = (response_buf*) malloc(sizeof(response_buf)*response.count);
+		}
 
 		responses[response.index] = response;
 
 		int j;
 		for (j=1;j<response.count;j++) {
 			response = getMessage();
-
-			pthread_mutex_lock(&lock);
-			completedSearches++;
-			pthread_mutex_unlock(&lock);
-
+			sem_post(&searchesCompleted);
 			responses[response.index] = response;
 		}
 
@@ -166,9 +153,9 @@ int main(int argc, char** argv) {
 		// printf("%s\n",argv[i]);
 	}
 	free(responses);
-	free(new_argv);
+	free(argv);
+	// free(new_argv);
 
-	pthread_mutex_destroy(&lock);
 	// char* msg = "no";
 	// final_command[0] = '\0';
 	// strcat(final_command,msg_send_command);
@@ -186,16 +173,13 @@ int main(int argc, char** argv) {
 
 int validPrefix(char* prefix) {
 	int length = strlen(prefix);
-	if (length < 3 || length > 100) return 0;
+	if (length < 3 || length > 20) return 0;
 	
 	char care;
 	for (int i=0;i<length;i++) {
 		care = prefix[i];
-		if (care >= 'A' || care <= 'Z' || care >= 'a' || care <= 'z') continue;
-		else {
-			printf("Invalid Prefix: %s\n",prefix);
-			return 0;
-		}
+		if ((care >= 'A' && care <= 'Z') || (care >= 'a' && care <= 'z')) continue;
+		else return 0;
 	}
 	return 1;
 }
@@ -222,11 +206,10 @@ char** getValidPrefixes(char** argv, int* argc) {
 		if (validPrefix(argv[i]) == 1) {
 			validPrefixes++;
 			new_argv[1+validPrefixes] = argv[i];
-			printf("Prefix %d copied\n",i-2);
 		}
 	}
 
-	*argc = validPrefixes;
+	*argc = validPrefixes+2;
 	return new_argv;
 }
 
@@ -306,27 +289,26 @@ response_buf getMessage() {
 
 void sighandler(int x) {
 
-	pthread_mutex_lock(&lock);
+	int completedSearches;
+	int passageCount;
+	sem_getvalue(&searchesCompleted,&completedSearches);
+	sem_getvalue(&count_of_passages,&passageCount);
+
+	int argc = numPrefixes;
+	char** argv = getValidPrefixes(prefixes,&argc);
 
 	int i;
-	if (initialized == 0) {
-		for (i=2;i<numPrefixes;i++)
-			printf("%s - pending\n",prefixes[i]);
-	}
-
-
-
 	if (completedSearches == 0)
-		for (i=2;i<numPrefixes;i++)
-			printf("%s - pending\n",prefixes[i]);
+		for (i=2;i<argc;i++)
+			printf("%s - pending\n",argv[i]);
 	else
-		for (i=2;i<numPrefixes;i++)
+		for (i=2;i<argc;i++)
 			if (completedSearches/passageCount > i-2) // passed
-				printf("%s - done\n",prefixes[i]);
+				printf("%s - done\n",argv[i]);
 			else if (completedSearches/passageCount == i-2 && completedSearches%passageCount != 0) // current prefix
-				printf("%s - %d of %d\n",prefixes[i],completedSearches%passageCount,passageCount);
+				printf("%s - %d of %d\n",argv[i],completedSearches%passageCount,passageCount);
 			else
-				printf("%s - pending\n",prefixes[i]); // future
+				printf("%s - pending\n",argv[i]); // future
+	free(argv);
 	
-	pthread_mutex_unlock(&lock);
 }
