@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
+#include <semaphore.h>
 #include "longest_word_search.h"
 #include "queue_ids.h"
 
@@ -51,55 +52,47 @@ char** prefixes;
 int passageCount;
 int completedSearches;
 int numPrefixes;
+int initialized;
+
+sem_t something;
 
 // Format:
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
 
 int main(int argc, char** argv) {
+	int i;
+	sem_init(&something,0,1);
+	printf("Semaphore val: %d",sem_getvalue(&something,&i));
+	sem_post(&something);
+	printf("Semaphore val: %d",sem_getvalue(&something,&i));
+	int x;
+	sem_getvalue(&something,&x);
+
 	if (argc < 3) {
 		fprintf(stderr,"No valid prefixes.\n");
 		return 0;
 	}
-	
-	int validPrefixes = 0;
-	int i;
-	for (i=2;i<argc;i++)
-		if (validPrefix(argv[i]) == 1) {
- 			validPrefixes++;
-			printf("Prefix %d (%s) is valid\n",validPrefixes,argv[i]);
-		}
-	if (validPrefixes == 0) {
-		fprintf(stderr,"No valid prefixes.\n");
-		return 0;
-	}
-
-	char** new_argv = (char**) malloc(sizeof(char*)*(validPrefixes+2));
-	new_argv[0] = argv[0];
-	new_argv[1] = argv[1];
-
-	validPrefixes = 0;
-	for (i=2;i<argc;i++) {
-		if (validPrefix(argv[i]) == 1) {
-			validPrefixes++;
-			new_argv[1+validPrefixes] = argv[i];
-			printf("Prefix %d copied\n",i-2);
-		}
-	}
-
-	argv = new_argv;
-	argc = validPrefixes+2;
-
-	printf("\n");
-	for (i=0;i<argc;i++)
-		printf("%s ",argv[i]);
 
 	prefixes = argv;
 	numPrefixes = argc;
+	initialized = 0;
+	signal(SIGINT, sighandler);
+
+	// int newSize = argc;
+	// char** new_argv = getValidPrefixes(argv,&newSize);
+
+
+	/**
+	 * Here is where. Idk anymore just kill me
+	 * I'm tired of this fucking project
+	 */
+	// prefixes = argv;
+	// numPrefixes = argc;
 
 	pthread_mutex_init(&lock, NULL);
 	completedSearches = 0;
 
-	signal(SIGINT, sighandler);
+	// signal(SIGINT, sighandler);
 
 	int secs; // seconds between sending prefix requests
 
@@ -207,6 +200,36 @@ int validPrefix(char* prefix) {
 	return 1;
 }
 
+char** getValidPrefixes(char** argv, int* argc) {
+	
+	int validPrefixes = 0;
+	int i;
+	for (i=2;i<(*argc);i++)
+		if (validPrefix(argv[i]) == 1)
+ 			validPrefixes++;
+
+	if (validPrefixes == 0) {
+		fprintf(stderr,"No valid prefixes.\n");
+		return 0;
+	}
+
+	char** new_argv = (char**) malloc(sizeof(char*)*(validPrefixes+2));
+	new_argv[0] = argv[0];
+	new_argv[1] = argv[1];
+
+	validPrefixes = 0;
+	for (i=2;i<(*argc);i++) {
+		if (validPrefix(argv[i]) == 1) {
+			validPrefixes++;
+			new_argv[1+validPrefixes] = argv[i];
+			printf("Prefix %d copied\n",i-2);
+		}
+	}
+
+	*argc = validPrefixes;
+	return new_argv;
+}
+
 void sendMessage(char* message, int prefixID) {
 	int msqid;
 	int msgflg = IPC_CREAT | 0666;
@@ -282,8 +305,17 @@ response_buf getMessage() {
 }
 
 void sighandler(int x) {
+
 	pthread_mutex_lock(&lock);
+
 	int i;
+	if (initialized == 0) {
+		for (i=2;i<numPrefixes;i++)
+			printf("%s - pending\n",prefixes[i]);
+	}
+
+
+
 	if (completedSearches == 0)
 		for (i=2;i<numPrefixes;i++)
 			printf("%s - pending\n",prefixes[i]);
