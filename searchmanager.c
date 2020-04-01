@@ -55,7 +55,32 @@ int numPrefixes;
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
 
 int main(int argc, char** argv) {
-	if (argc < 3) return 0;
+	if (argc < 3) {
+		fprintf(stderr,"No valid prefixes.\n");
+		return 0;
+	}
+	
+	int validPrefixes = 0;
+	int i;
+	for (i=2;i<argc;i++)
+		if (validPrefix(argv[i]) == 1) validPrefixes++;
+	if (validPrefixes == 0) {
+		fprintf(stderr,"No valid prefixes.\n");
+		return 0;
+	}
+
+	char** new_argv = (char**) malloc(sizeof(char*)*(validPrefixes+2));
+	new_argv[0] = argv[0];
+	new_argv[1] = argv[1];
+
+	validPrefixes = 0;
+	for (i=2;i<argc;i++) {
+		if (validPrefix(argv[i]) == 1) validPrefixes++;
+		new_argv[2+validPrefixes] = argv[i];
+	}
+
+	argv = new_argv;
+
 	prefixes = argv;
 	numPrefixes = argc;
 
@@ -88,7 +113,6 @@ int main(int argc, char** argv) {
 	response_buf* responses = NULL;
 	response_buf response;
 
-	int i;
 	for (i=2;i<argc;i++) {
 		// final_command[0] = '\0';
 		// strcat(final_command,msg_send_command);
@@ -137,6 +161,7 @@ int main(int argc, char** argv) {
 		// printf("%s\n",argv[i]);
 	}
 	free(responses);
+	free(new_argv);
 
 	pthread_mutex_destroy(&lock);
 	// char* msg = "no";
@@ -152,6 +177,18 @@ int main(int argc, char** argv) {
 	printf("Exiting ...\n");
 	
 	return 0;
+}
+
+int validPrefix(char* prefix) {
+	int length = strlen(prefix);
+	if (length < 3 || length > 100) return 0;
+
+	for (int i=0;i<length;i++) {
+		char care = prefix[i];
+		if (care >= 'A' || care <= 'Z' || care >= 'a' || care <= 'z') continue;
+		else return 0;
+	}
+	return 1;
 }
 
 void sendMessage(char* message, int prefixID) {

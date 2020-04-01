@@ -1,3 +1,12 @@
+/**
+ * @Author: Asa Dillahunty
+ * 
+ * This class sends and receives messsages
+ * over an IPC queue. The messages received 
+ * contain "prefixes," which this program takes
+ * and searches txt files for their longest word.
+ */
+
 package edu.cs300;
 
 import java.util.Scanner;
@@ -6,9 +15,17 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.io.File;
 
 public class PassageProcessor {
-	private static String PASSAGES_PATHS = "passages.txt";
+	private static String PASSAGES_PATHS = "passages.txt"; // This text file contains the paths of all the text files to be searched
 	private static int BLOCK_QUEUE_SIZE = 10;
 
+	/**
+	 * This static method processes passages stored in the text file "passages.txt"
+	 * What it means to process is to read the passage, accept a prefix, and return the longest 
+	 * word with that prefix
+	 * 
+	 * This method communicates over IPCS queues so that it can be fed prefixes from another 
+	 * program (searchmanager.c)
+	 */
 	public static void ProcessPassages() {
 		ArrayList<Worker> workers = new ArrayList<Worker>();
 		ArrayBlockingQueue<ResultMessage> results = new ArrayBlockingQueue<ResultMessage>(BLOCK_QUEUE_SIZE);
@@ -17,54 +34,71 @@ public class PassageProcessor {
 		
 		try {
 			Scanner pass = new Scanner(new File(PASSAGES_PATHS));
+			String passPath;
+			File passage;
 			while (pass.hasNextLine()) {
-				workers.add(new Worker(pass.nextLine(),workers.size(),new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE), results));
+				passPath = pass.nextLine();
+				try {
+					passage = new File(passPath);
+					if (!passage.exists()) {
+						System.err.println("File - \""+passPath+"\" does not exist.s");
+						continue;
+					}
+				} catch (NullPointerException e) {
+					System.err.println(e.getMessage());
+					continue;
+				}
+				workers.add(new Worker(passPath,workers.size(),new ArrayBlockingQueue<String>(BLOCK_QUEUE_SIZE), results));
 				workers.get(workers.size()-1).start();
 			}
 			pass.close();
+			if (workers.size() == 0) {
+				System.err.println("No valid passages to process.");
+				return;
+			}
 		}
-		catch(Exception e){return;}
+		catch(Exception e) {
+			System.err.println(e.getMessage());
+			return;
+		}
 
+		// resposnible for handling prefix distribution
 		PrefixManager pManager = new PrefixManager(prefixQueue, workers);
 		pManager.start();
 		
 		
 		// while prefixes exist
-		// Somehow get a prefix
 		while(true) {
 			//get prefix from this statement
 			SearchRequest message = MessageJNI.readPrefixRequestMsg();
-			if (message == null) {
-				System.out.println("null message");
-				try {
-					Thread.sleep(1);
-				} catch (Exception e) {}
-				break;
-			}
 			System.out.println("**prefix("+message.requestID+") "+message.prefix+" recieved");
-			if (message.prefix.length() < 3 || message.prefix.compareTo("   ") == 0) break;
+
+			// Kills the process if invalid prefix
 			// **prefix(1) con received
+
+			if (message.prefix.length() < 3 || message.prefix.compareTo("   ") == 0) break;
 			try {
 				prefixQueue.put(message.prefix);
-				// prefixCount++;
-				// prefixQueue.put("con");
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				System.err.println("Error putting: \""+message.prefix+"\" on the Prefix Queue");
+			}
 
 			ResultMessage msg;
 			for (int i=0;i<workers.size();i++)
 				try {
 					msg = results.take();
 
+					// Message format: 
+					// MessageJNI.writeLongestWordResponseMsg(prefixID, prefix, passageIndex, passageName, longestWord, passageCount, present);
 					if (msg.found) {
-						// System.out.println(msg+"\n"+"Worker ID: "+worker_id+"\nLongest Word: "+longestWord);
-						// System.out.println(results.take());
 						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, msg.worker_id, workers.get(msg.worker_id).passageName, msg.longestWord, workers.size(), 1);
 					}
 					else {
 						MessageJNI.writeLongestWordResponseMsg(message.requestID, message.prefix, msg.worker_id, workers.get(msg.worker_id).passageName, "----", workers.size(), 0);
 					}
-					// MessageJNI.writeLongestWordResponseMsg(prefixID, prefix, passageIndex, passageName, longestWord, passageCount, present);
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					System.err.println(e.getMessage());
+				}
 		}
 
 		// after all the prefixes
@@ -76,7 +110,7 @@ public class PassageProcessor {
 			try {
 				slave.join();
 			} catch (Exception e) {
-				System.out.println("Worker("+slave.id+") failed to join.");
+				System.err.println("Worker("+slave.id+") failed to join.");
 			}
 		}
 	}
@@ -86,9 +120,13 @@ public class PassageProcessor {
 	}
 }
 
+/**
+ * This class was written to handle the distribution of prefixes to all of the workers
+ * in the Process Passages function written above
+ */
 class PrefixManager extends Thread {
-	public ArrayBlockingQueue<String> prefixes;
-	public ArrayList<Worker> workers;
+	private ArrayBlockingQueue<String> prefixes;
+	private ArrayList<Worker> workers;
 
 	public PrefixManager(ArrayBlockingQueue<String> prefixes, ArrayList<Worker> workers) {
 		this.prefixes = prefixes;
@@ -96,7 +134,7 @@ class PrefixManager extends Thread {
 	}
 
 	public void run() {
-		String prefix = "*";
+		String prefix;
 		
 		while (true) {
 			try {

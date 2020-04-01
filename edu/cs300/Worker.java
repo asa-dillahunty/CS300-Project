@@ -38,6 +38,7 @@ class Worker extends Thread {
 		try {
 			passage = new Scanner(new File(this.passagePath));
 		} catch (Exception e) {
+			System.err.println(e.getMessage());
 			return goodWords;
 		}
 
@@ -81,7 +82,7 @@ class Worker extends Thread {
 				this.prefixCount++;
 				
 			} catch(InterruptedException e){
-				System.out.println(e.getMessage());
+				System.err.println(e.getMessage());
 			}
 		}
 	}
