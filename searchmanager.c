@@ -41,6 +41,7 @@ strlcpy(char       *dst,        /* O - Destination string */
 }
 #endif
 
+int validPrefix(char* prefix);
 void sendMessage(char* message, int prefixID);
 response_buf getMessage();
 void sighandler(int);
@@ -63,7 +64,10 @@ int main(int argc, char** argv) {
 	int validPrefixes = 0;
 	int i;
 	for (i=2;i<argc;i++)
-		if (validPrefix(argv[i]) == 1) validPrefixes++;
+		if (validPrefix(argv[i]) == 1) {
+ 			validPrefixes++;
+			printf("Prefix %d (%s) is valid\n",validPrefixes,argv[i]);
+		}
 	if (validPrefixes == 0) {
 		fprintf(stderr,"No valid prefixes.\n");
 		return 0;
@@ -75,11 +79,19 @@ int main(int argc, char** argv) {
 
 	validPrefixes = 0;
 	for (i=2;i<argc;i++) {
-		if (validPrefix(argv[i]) == 1) validPrefixes++;
-		new_argv[2+validPrefixes] = argv[i];
+		if (validPrefix(argv[i]) == 1) {
+			validPrefixes++;
+			new_argv[1+validPrefixes] = argv[i];
+			printf("Prefix %d copied\n",i-2);
+		}
 	}
 
 	argv = new_argv;
+	argc = validPrefixes+2;
+
+	printf("\n");
+	for (i=0;i<argc;i++)
+		printf("%s ",argv[i]);
 
 	prefixes = argv;
 	numPrefixes = argc;
@@ -182,11 +194,15 @@ int main(int argc, char** argv) {
 int validPrefix(char* prefix) {
 	int length = strlen(prefix);
 	if (length < 3 || length > 100) return 0;
-
+	
+	char care;
 	for (int i=0;i<length;i++) {
-		char care = prefix[i];
+		care = prefix[i];
 		if (care >= 'A' || care <= 'Z' || care >= 'a' || care <= 'z') continue;
-		else return 0;
+		else {
+			printf("Invalid Prefix: %s\n",prefix);
+			return 0;
+		}
 	}
 	return 1;
 }
