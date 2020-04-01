@@ -68,6 +68,7 @@ int main(int argc, char** argv) {
 
 	if (argc < 3) {
 		fprintf(stderr,"No valid prefixes.\n");
+		printf("Exiting ...\n");
 		return 0;
 	}
 	int i;
@@ -241,6 +242,7 @@ char** getValidPrefixes(char** argv, int* argc, int main) {
 
 	if (validPrefixes == 0) {
 		fprintf(stderr,"No valid prefixes.\n");
+		printf("Exiting ...\n");
 		exit(1);
 	}
 

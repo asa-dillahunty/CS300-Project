@@ -1,16 +1,6 @@
-texts/book.txt
-texts/Alice_in_Wonderland.txt
-texts/Frankenstein.txt
-texts/Moby_Dick.txt
-texts/Tom_Sawyer.txt
-asa.txt
-texts/simple1.txt
-texts/simple2.txt
-texts/simple3.txt
-texts/Little_Women.txt
-texts/Pride_And_Prejudice.txt
 texts/Sense_And_Sensibility.txt
 texts/Mansfield_Park.txt
+texts/book.txt
 texts/The_Call_Of_The_Wild.txt
 texts/Tale_Of_Two_Cities.txt
 texts/Peter_Pan.txt
