@@ -12,6 +12,9 @@
 #include "longest_word_search.h"
 #include "queue_ids.h"
 
+/**
+ * This was stolen from Dr. Anderson as well
+ */
 #ifndef mac
 size_t                  /* O - Length of string */
 strlcpy(char       *dst,        /* O - Destination string */
@@ -50,10 +53,9 @@ void sighandler(int);
 
 char** prefixes;
 int numPrefixes;
+int passageCount;
 
-sem_t validPrefixIndex;
 sem_t searchesCompleted;
-sem_t count_of_passages;
 // Format:
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
 
@@ -64,7 +66,6 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	int i;
-	sem_init(&validPrefixIndex,0,0);
 	sem_init(&searchesCompleted,0,0);
 
 	prefixes = argv;
@@ -124,12 +125,13 @@ int main(int argc, char** argv) {
 		sleep(secs);
 
 		response = getMessage();
-		sem_post(&searchesCompleted);
 
 		if (responses == NULL) {
-			sem_init(&count_of_passages,0,response.count);
+			passageCount = response.count;
 			responses = (response_buf*) malloc(sizeof(response_buf)*response.count);
 		}
+
+		sem_post(&searchesCompleted);
 
 		responses[response.index] = response;
 
@@ -171,6 +173,14 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
+/**
+ * Tests if a character pointer is a valid prefix
+ * A valid prefix is defined as being between 3 and 20 characters in length
+ * and only consisting of alphabetic characters
+ * 
+ * @param prefix: character pointer to tested if it can make a vaild prefix
+ * @return 0 if false, 1 if true
+ */
 int validPrefix(char* prefix) {
 	int length = strlen(prefix);
 	if (length < 3 || length > 20) return 0;
@@ -184,6 +194,21 @@ int validPrefix(char* prefix) {
 	return 1;
 }
 
+/**
+ * Takes argv and argc and removes the invalid prefixes
+ * Does not change argv, but does change argc
+ * 
+ * * * * THIS IS NOT A DEEP COPY * * * *
+ * 
+ * ./searchmanager 2 con pre wor no k3k hom
+ * 		to
+ * ./searchmanager 2 con pre wor hom
+ * 
+ * @param argv: the list of prefixes
+ * @param argc: the length of the list of prefixes
+ * 		this value is changed to the new length during the function call
+ * @return the new list of prefixes, containing only valid prefixes
+ */
 char** getValidPrefixes(char** argv, int* argc) {
 	
 	int validPrefixes = 0;
@@ -194,7 +219,7 @@ char** getValidPrefixes(char** argv, int* argc) {
 
 	if (validPrefixes == 0) {
 		fprintf(stderr,"No valid prefixes.\n");
-		return 0;
+		exit(1);
 	}
 
 	char** new_argv = (char**) malloc(sizeof(char*)*(validPrefixes+2));
@@ -213,6 +238,13 @@ char** getValidPrefixes(char** argv, int* argc) {
 	return new_argv;
 }
 
+/**
+ * This function was stolen from Dr. Anderson Herzog's msgsnd_pr.c
+ * It sends messages over the IPCS queue
+ * 
+ * @param message: the message to be send (typically a prefix)
+ * @param prefixID: the message id
+ */
 void sendMessage(char* message, int prefixID) {
 	int msqid;
 	int msgflg = IPC_CREAT | 0666;
@@ -248,6 +280,13 @@ void sendMessage(char* message, int prefixID) {
 		printf("Message(%d): \"%s\" Sent (%d bytes)\n", sbuf.id, sbuf.prefix,(int)buf_length);
 }
 
+/**
+ * This function was stole from Dr. Anderson Herzog's msgrcv_lwr.c
+ * It recieves messages put on the IPCS queue
+ * 
+ * @returns a response_buf struct that holds information like
+ * index, count, prefix, location_description, longest_word etc...
+ */
 response_buf getMessage() {
 	int msqid;
 	int msgflg = IPC_CREAT | 0666;
@@ -287,12 +326,16 @@ response_buf getMessage() {
 	return rbuf;
 }
 
+/**
+ * This prevents the program from ending when someone enters ^C
+ * Instead, it prints a progress report
+ * 
+ * @param x: I have no idea
+ */
 void sighandler(int x) {
 
 	int completedSearches;
-	int passageCount;
 	sem_getvalue(&searchesCompleted,&completedSearches);
-	sem_getvalue(&count_of_passages,&passageCount);
 
 	int argc = numPrefixes;
 	char** argv = getValidPrefixes(prefixes,&argc);
@@ -310,5 +353,5 @@ void sighandler(int x) {
 			else
 				printf("%s - pending\n",argv[i]); // future
 	free(argv);
-	
 }
+
