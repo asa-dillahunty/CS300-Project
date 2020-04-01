@@ -14,7 +14,7 @@ all: $(J_OBJS) $(C_OBJS)
 edu_cs300_MessageJNI.h: edu/cs300/MessageJNI.java
 	javac -h . edu/cs300/MessageJNI.java
 
-edu/cs300/PassageProcessor.class: edu/cs300/PassageProcessor.java edu/cs300/Worker.java libsystem5msg.so
+edu/cs300/PassageProcessor.class: edu/cs300/PassageProcessor.java edu/cs300/Worker.class edu_cs300_MessageJNI.h libsystem5msg.so 
 	javac edu/cs300/PassageProcessor.java
 
 edu/cs300/PrefixManager.class: edu/cs300/PassageProcessor.class

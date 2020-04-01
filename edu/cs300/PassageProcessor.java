@@ -117,6 +117,7 @@ public class PassageProcessor {
 
 	public static void main(String[] args) {
 		ProcessPassages();
+		System.out.println("Terminating ...");
 	}
 }
 
