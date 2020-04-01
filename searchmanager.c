@@ -45,8 +45,8 @@ strlcpy(char       *dst,        /* O - Destination string */
 }
 #endif
 
-int validPrefix(char* prefix);
-char** getValidPrefixes(char** argv, int* argc);
+int validPrefix(char* prefix, int main);
+char** getValidPrefixes(char** argv, int* argc, int main);
 void sendMessage(char* message, int prefixID);
 response_buf getMessage();
 void sighandler(int);
@@ -56,9 +56,9 @@ int numPrefixes;
 int passageCount;
 
 sem_t searchesCompleted;
+
 // Format:
 // 	./searchmanager <secs between sending prefix requests> <prefix1> <prefix2> ...
-
 int main(int argc, char** argv) {
 
 	if (argc < 3) {
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 	numPrefixes = argc;
 	signal(SIGINT, sighandler);
 	
-	argv = getValidPrefixes(prefixes,&argc);
+	argv = getValidPrefixes(prefixes,&argc, 1);
 
 	
 	
@@ -179,16 +179,26 @@ int main(int argc, char** argv) {
  * and only consisting of alphabetic characters
  * 
  * @param prefix: character pointer to tested if it can make a vaild prefix
+ * @param main: 0 if from sigint handler, 1 if from main
  * @return 0 if false, 1 if true
  */
-int validPrefix(char* prefix) {
+int validPrefix(char* prefix, int main) {
 	int length = strlen(prefix);
-	if (length < 3 || length > 20) return 0;
+	if (length < 3 || length > 20) 
+		if (main == 1) {
+			fprintf(stderr,"\"%s\" is an invalid prefix.",prefix);
+			return 0;
+		}
+		else return 0;
 	
 	char care;
 	for (int i=0;i<length;i++) {
 		care = prefix[i];
 		if ((care >= 'A' && care <= 'Z') || (care >= 'a' && care <= 'z')) continue;
+		else if (main == 1) {
+			fprintf(stderr,"\"%s\" is an invalid prefix.",prefix);
+			return 0;
+		}
 		else return 0;
 	}
 	return 1;
@@ -207,14 +217,20 @@ int validPrefix(char* prefix) {
  * @param argv: the list of prefixes
  * @param argc: the length of the list of prefixes
  * 		this value is changed to the new length during the function call
+ * @param main: 1 if this call was from the main (not SIGINT)
  * @return the new list of prefixes, containing only valid prefixes
  */
-char** getValidPrefixes(char** argv, int* argc) {
+char** getValidPrefixes(char** argv, int* argc, int main) {
 	
+	int c,j;
+	for (c=0;c<argc;c++)
+		for (j=0;j<strlen(argv[c]);j++)
+			argv[c][j] = tolower(argv[c][j]);
+
 	int validPrefixes = 0;
 	int i;
 	for (i=2;i<(*argc);i++)
-		if (validPrefix(argv[i]) == 1)
+		if (validPrefix(argv[i],main) == 1)
  			validPrefixes++;
 
 	if (validPrefixes == 0) {
@@ -228,7 +244,7 @@ char** getValidPrefixes(char** argv, int* argc) {
 
 	validPrefixes = 0;
 	for (i=2;i<(*argc);i++) {
-		if (validPrefix(argv[i]) == 1) {
+		if (validPrefix(argv[i],0) == 1) {
 			validPrefixes++;
 			new_argv[1+validPrefixes] = argv[i];
 		}
@@ -338,7 +354,7 @@ void sighandler(int x) {
 	sem_getvalue(&searchesCompleted,&completedSearches);
 
 	int argc = numPrefixes;
-	char** argv = getValidPrefixes(prefixes,&argc);
+	char** argv = getValidPrefixes(prefixes,&argc,0);
 
 	int i;
 	if (completedSearches == 0)
@@ -354,4 +370,3 @@ void sighandler(int x) {
 				printf("%s - pending\n",argv[i]); // future
 	free(argv);
 }
-
