@@ -68,7 +68,7 @@ class Worker extends Thread {
 	}
 
 	public void run() {
-		System.out.println("Worker-"+this.id+" ("+this.passageName+") thread started ...");
+		System.out.print("Worker-"+this.id+" ("+this.passageName+") thread started ...\n");
 		this.textTrieTree = new Trie(getWordList());
 		// System.out.println("Worker-"+this.id+" Max Depth:"+this.textTrieTree.maxDepth());
 		// System.out.println("Worker-"+this.id+" Longest String:"+this.textTrieTree.longestString());
@@ -84,11 +84,11 @@ class Worker extends Thread {
 				boolean found = this.textTrieTree.contains(prefix);
 				
 				if (!found){
-					System.out.println("Worker-"+this.id+" "+prefixCount+":"+ prefix+" ==> not found ");
+					System.out.print("Worker-"+this.id+" "+prefixCount+":"+ prefix+" ==> not found\n");
 					resultsOutputArray.put(new ResultMessage(this.id, "",false));
 				} else{
 					word = this.textTrieTree.longestWithPrefix(prefix);
-					System.out.println("Worker-"+this.id+" "+prefixCount+":"+ prefix+" ==> "+word);
+					System.out.print("Worker-"+this.id+" "+prefixCount+":"+ prefix+" ==> "+word+"\n");
 					resultsOutputArray.put(new ResultMessage(this.id,word,true));
 				}
 

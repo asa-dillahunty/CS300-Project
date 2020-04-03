@@ -71,7 +71,7 @@ public class PassageProcessor {
 		while(true) {
 			//get prefix from this statement
 			SearchRequest message = MessageJNI.readPrefixRequestMsg();
-			System.out.println("**prefix("+message.requestID+") "+message.prefix+" recieved");
+			System.out.print("**prefix("+message.requestID+") "+message.prefix+" recieved\n");
 
 			// Kills the process if invalid prefix
 			// **prefix(1) con received
